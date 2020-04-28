@@ -1,0 +1,6 @@
+ext {
+    //Property names
+    NEWS_API_KEY_NAME = "NewsApiKey"
+
+    NEWS_API_KEY = "\""+System.getenv(NEWS_API_KEY_NAME)+"\""
+}

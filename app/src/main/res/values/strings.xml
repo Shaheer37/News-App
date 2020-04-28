@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">News App</string>
+
+    <string name="full_story">Full Story</string>
+    <string name="title_newsarticle_list">News Articles</string>
+    <string name="title_newsarticle_detail">News Article Detail</string>
+
+
+    <string name="get_news_fail">Failed to retrieve latest news. Please check your network connectivity.</string>
+    <string name="tryagain">Try Again</string>
+</resources>

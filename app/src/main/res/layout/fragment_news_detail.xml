@@ -1,0 +1,65 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/news_view_space"
+        tools:context=".ui.news.newsdetails.NewsDetailFragment">
+
+        <TextView
+            android:id="@+id/news_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/news_view_space"
+            android:layout_marginBottom="@dimen/news_view_space"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:layout_constraintVertical_bias="0"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/news_image"
+            android:minLines="0"
+            android:textSize="@dimen/news_detail_title_text_size"
+            android:textStyle="bold"
+            android:textColor="?attr/news_detail_title_text_color"/>
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/news_image"
+            android:layout_width="@dimen/news_article_image_width"
+            android:layout_height="@dimen/news_article_image_height"
+            android:layout_marginTop="@dimen/news_view_space"
+            android:layout_marginBottom="@dimen/news_view_space"
+            app:layout_constraintTop_toBottomOf="@id/news_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/news_summary"
+            app:placeholderImage="@drawable/place_holder"
+            app:placeholderImageScaleType="centerCrop" />
+
+        <TextView
+            android:id="@+id/news_summary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/news_view_space"
+            android:layout_marginBottom="@dimen/news_view_space"
+            app:layout_constraintTop_toBottomOf="@+id/news_image"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/news_article_link_btn"
+            />
+
+        <Button
+            android:id="@+id/news_article_link_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/news_view_space"
+            app:layout_constraintTop_toBottomOf="@+id/news_summary"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:text="@string/full_story"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
