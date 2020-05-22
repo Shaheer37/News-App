@@ -1,11 +1,12 @@
 version: 2
+
+orbs:
+  android: circleci/android@0.2.0
+
 jobs:
   build:
     working_directory: ~/code
-    docker:
-      - image: circleci/android:api-25-alpha
-    environment:
-      JVM_OPTS: -Xmx3200m
+    executor: android/android
     steps:
       - checkout
       - restore_cache:
