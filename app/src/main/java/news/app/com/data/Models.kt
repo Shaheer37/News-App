@@ -9,6 +9,7 @@ data class NewsResponse(
 )
 
 data class NewsEntity(
+    var id: String = "",
     var title: String = "",
     var abstract: String = "",
     @SerializedName("url") var articleUrl: String = "",
