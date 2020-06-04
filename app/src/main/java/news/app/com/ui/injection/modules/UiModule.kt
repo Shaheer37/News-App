@@ -1,19 +1,48 @@
 package news.app.com.ui.injection.modules
 
+import android.content.Context
 import news.app.com.domain.executor.PostExecutionThread
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.android.AndroidInjector
 import dagger.android.ContributesAndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
+import news.app.com.ui.App
+import news.app.com.ui.NewsMapper
+import news.app.com.ui.SourceMapper
 import news.app.com.ui.UiThread
+import news.app.com.ui.injection.components.AppComponent
 import news.app.com.ui.injection.subcomponents.NewsFragmentSubcomponent
 import news.app.com.ui.news.newsdetails.NewsDetailFragment
 import news.app.com.ui.news.viewnews.NewsFragment
+import news.app.com.ui.utils.getUTCDateTimeFormatter
+import news.app.com.ui.utils.getCurrentLocale
+import java.text.SimpleDateFormat
+import javax.inject.Named
 
 @Module(subcomponents = [NewsFragmentSubcomponent::class])
 interface UiModule {
+
+    @Module
+    companion object{
+//        @Provides
+//        @Named(AppComponent.ARTICLE_DATE_FORMATTER)
+//        fun providesArticlePublishedDateFormatter(app: App): SimpleDateFormat{
+//            return app.getCurrentLocale().getUTCDateTimeFormatter()
+//        }
+
+        @Provides
+        @JvmStatic
+        fun providesNewsMapper(@Named(AppComponent.CONTEXT) context: Context): NewsMapper{
+            return NewsMapper(context.getCurrentLocale().getUTCDateTimeFormatter(), SourceMapper())
+        }
+    }
+
+    @Binds
+    @Named(AppComponent.CONTEXT)
+    fun bindsContext(app: App): Context
 
     @Binds
     @IntoMap

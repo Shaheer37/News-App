@@ -1,15 +1,17 @@
 package news.app.com.ui.mappers
 
-import news.app.com.ui.ImageMapper
+import news.app.com.test.factory.DataFactory
 import news.app.com.ui.NewsMapper
+import news.app.com.ui.SourceMapper
 import news.app.com.ui.test.factory.NewsDataFactory
+import news.app.com.ui.utils.getUTCDateTimeFormatter
 import org.junit.Assert
 import org.junit.Test
 
 
 class NewsMapperTest {
 
-    private val newsMapper = NewsMapper(ImageMapper())
+    private val newsMapper = NewsMapper(DataFactory.getLocale().getUTCDateTimeFormatter(), SourceMapper())
 
     @Test
     fun testMapper(){
@@ -20,9 +22,9 @@ class NewsMapperTest {
         Assert.assertEquals(newsModel.url, actualMappedNews.articleUrl)
         Assert.assertEquals(newsModel.title, actualMappedNews.title)
         Assert.assertEquals(newsModel.summary, actualMappedNews.summary)
-        Assert.assertEquals(newsModel.thumbImage!!.url, actualMappedNews.thumbImage!!.url)
-        Assert.assertEquals(newsModel.thumbImage!!.caption, actualMappedNews.thumbImage!!.caption)
-        Assert.assertEquals(newsModel.articleImage!!.url, actualMappedNews.articleImage!!.url)
-        Assert.assertEquals(newsModel.articleImage!!.caption, actualMappedNews.articleImage!!.caption)
+        Assert.assertEquals(newsModel.image, actualMappedNews.image)
+        Assert.assertEquals(newsModel.publishedDate, actualMappedNews.publishedDate)
+        Assert.assertEquals(newsModel.source.id, actualMappedNews.source.id)
+        Assert.assertEquals(newsModel.source.name, actualMappedNews.source.name)
     }
 }

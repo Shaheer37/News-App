@@ -15,7 +15,8 @@ class NewsRepositoryImpl @Inject constructor(
 ): NewsRepository {
 
     override suspend fun getNews(): List<NewsModel> = newsService.getNews().run {
-        return if(status == "OK") results.map {
+        Timber.d(this.toString())
+        return if(status == "ok") articles.map {
             newsMapper.mapToDomain(it)
         }
         else throw IOException("Error! Unsuccessful response from server.")

@@ -64,15 +64,16 @@ class NewsDetailFragment : Fragment() {
             news_title.text = it
         })
 
-        viewModel.newsImage.observe(viewLifecycleOwner, Observer {
-            if(it != null){
-                news_image.setImageURI(it.url)
-                news_image.contentDescription = it.caption
-            }
-        })
-
         viewModel.newsSummary.observe(viewLifecycleOwner, Observer {
             news_summary.text = it
+        })
+
+        viewModel.newsImage.observe(viewLifecycleOwner, Observer {
+            news_image.setImageURI(it)
+        })
+
+        viewModel.newsImageDescription.observe(viewLifecycleOwner, Observer {
+            news_image.contentDescription = it
         })
 
         viewModel.onOpenNewsArticle.observe(viewLifecycleOwner, EventObserver{

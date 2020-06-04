@@ -13,7 +13,6 @@ import news.app.com.R
 import news.app.com.domain.GetNewsUsecase
 import news.app.com.domain.models.NewsModel
 import news.app.com.test.factory.NewsDataFactory
-import news.app.com.ui.ImageMapper
 import news.app.com.ui.NewsMapper
 import news.app.com.ui.news.viewnews.NewsViewModel
 import news.app.com.domain.models.NetworkResult
@@ -26,16 +25,20 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.matcher.ViewMatchers.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
+import news.app.com.data.retrofit.DataFactory
+import news.app.com.test.factory.DummyDataFactory
+import news.app.com.ui.SourceMapper
 import news.app.com.ui.injection.ViewModelFactory
 import news.app.com.ui.news.viewnews.NewsAdapter
 import news.app.com.ui.utils.EspressoIdlingResource
+import news.app.com.ui.utils.getUTCDateTimeFormatter
 import org.junit.After
 
 
 @RunWith(AndroidJUnit4ClassRunner::class)
 class NewsFragmentTest {
 
-    private val newsMapper = NewsMapper(ImageMapper())
+    private val newsMapper = NewsMapper(DummyDataFactory.randomLocale().getUTCDateTimeFormatter(), SourceMapper())
     private val getNewsUsecase = mock(GetNewsUsecase::class.java)
 
     private lateinit var newsViewModelFactory: ViewModelFactory

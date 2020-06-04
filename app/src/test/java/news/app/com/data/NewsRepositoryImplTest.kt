@@ -20,7 +20,7 @@ import org.junit.rules.ExpectedException
 @RunWith(JUnit4::class)
 class NewsRepositoryImplTest {
 
-    private val newsMapper = NewsMapper(MediaMapper())
+    private val newsMapper = NewsMapper(SourceMapper())
     private val newsService = mock(NewsService::class.java)
 
     private val newsRepositoryImpl = NewsRepositoryImpl(newsService, newsMapper)
@@ -32,9 +32,9 @@ class NewsRepositoryImplTest {
     @ExperimentalCoroutinesApi
     fun getNewsTest() = runBlockingTest{
         val newsEntities = listOf(
-            NewsDataFactory.makeNewsEntityWithNoImage(),
-            NewsDataFactory.makeNewsEntityWithAllThumbAllArticle(),
-            NewsDataFactory.makeNewsEntityWithNoLargeThumbImageNo3by2Article()
+            NewsDataFactory.makeNewsEntity(),
+            NewsDataFactory.makeNewsEntity(),
+            NewsDataFactory.makeNewsEntity()
         )
 
         val expectedNewsModels = newsEntities.map { newsMapper.mapToDomain(it) }
@@ -60,7 +60,7 @@ class NewsRepositoryImplTest {
     }
 
     suspend fun stubNewsServiceGetNews(newsList: List<NewsEntity>) {
-        `when`(newsService.getNews()).thenReturn(NewsDataFactory.makeNewsResponse(newsList))
+        `when`(newsService.getNews()).thenReturn(NewsDataFactory.makeNewsResponse(newsList.size, newsList))
     }
 
 

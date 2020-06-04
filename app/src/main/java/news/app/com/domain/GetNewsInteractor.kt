@@ -16,6 +16,7 @@ class GetNewsUsecaseImpl @Inject constructor(
         try {
             NetworkResult.Success(newsRepository.getNews())
         }catch (ex: Exception){
+            ex.printStackTrace()
             NetworkResult.Error(ex)
         }
     }

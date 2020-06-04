@@ -10,8 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object DataFactory{
 
-//    private const val BASE_URL = "https://api.myjson.com/bins/"
-    private const val BASE_URL = "https://api.nytimes.com/"
+    private const val BASE_URL = "https://newsapi.org/v2/"
 
     fun makeService(showLogs: Boolean = true): NewsService {
         val okHttpClient = makeOkHttpClient(makeLoggingInterceptor(showLogs))

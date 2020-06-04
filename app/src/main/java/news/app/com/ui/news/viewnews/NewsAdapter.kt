@@ -28,8 +28,8 @@ class NewsAdapter @Inject constructor(private val onNewsClickedEventListener: On
         fun bind(){
             val news = getItem(adapterPosition)
             news_title.text = news.title
-            news_image.setImageURI(news.thumbImage?.url)
-            news_image.contentDescription = news.thumbImage?.caption
+            news_image.setImageURI(news.image)
+            news_image.contentDescription = news.getImageDescription()
 
             containerView.setOnClickListener { onNewsClickedEventListener.onNewsClicked(news) }
         }
@@ -44,7 +44,10 @@ class NewsDiffCallback : DiffUtil.ItemCallback<News>() {
     override fun areContentsTheSame(oldItem: News, newItem: News): Boolean {
         return oldItem.summary == newItem.summary &&
             oldItem.articleUrl == newItem.articleUrl &&
-            oldItem.thumbImage == newItem.thumbImage &&
-            oldItem.articleImage == newItem.articleImage
+            oldItem.image == newItem.image &&
+            oldItem.writer == newItem.writer &&
+            oldItem.publishedDate.compareTo(newItem.publishedDate) == 0 &&
+            oldItem.source?.id == newItem.source?.id &&
+            oldItem.source?.name == newItem.source?.name
     }
 }

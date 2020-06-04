@@ -20,7 +20,7 @@ class App: Application(), HasAndroidInjector {
     override fun onCreate() {
         super.onCreate()
 
-        DaggerAppComponent.create().inject(this)
+        DaggerAppComponent.factory().create(this).inject(this)
 
         Fresco.initialize(this)
         Timber.plant(Timber.DebugTree())

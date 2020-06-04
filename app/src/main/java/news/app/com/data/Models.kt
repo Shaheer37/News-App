@@ -5,33 +5,22 @@ import com.google.gson.annotations.SerializedName
 
 data class NewsResponse(
     val status: String = "",
-    val results: List<NewsEntity> = emptyList()
+    val totalResults: Int = 0,
+    val articles: List<NewsEntity> = emptyList()
 )
 
 data class NewsEntity(
     var id: String = "",
     var title: String = "",
-    var abstract: String = "",
-    @SerializedName("url") var articleUrl: String = "",
-    @SerializedName("byline") var writer: String = "",
-    @SerializedName("published_date") var publishedDate: String = "",
-    var media: List<MediaEntity> = listOf()
-)
-
-data class MediaEntity(
-    var type: String = "",
-    var subtype: String = "",
-    var caption: String = "",
-    var copyright: String = "",
-    @SerializedName("approved_for_syndication")
-    var approvedForSyndication: Int,
-    @SerializedName("media-metadata")
-    var mediaMetadata: List<MediaMetadataEntity> = listOf()
-)
-
-data class MediaMetadataEntity(
+    var description: String = "",
+    var author: String? = null,
     var url: String = "",
-    var format: String = "",
-    var height: Int = 0,
-    var width: Int = 0
+    @SerializedName("publishedAt") var publishedDate: String = "",
+    @SerializedName("urlToImage") var imageUrl: String = "",
+    var source: SourceEntity? = null
+)
+
+data class SourceEntity(
+    var id: String? = null,
+    var name: String? = null
 )

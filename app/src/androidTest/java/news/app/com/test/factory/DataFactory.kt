@@ -6,6 +6,8 @@ import java.util.concurrent.ThreadLocalRandom
 
 object DummyDataFactory {
 
+    fun randomLocale(): Locale = Locale.US
+
     fun randomString():String{
         return UUID.randomUUID().toString()
     }

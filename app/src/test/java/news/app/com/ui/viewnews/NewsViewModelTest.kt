@@ -9,12 +9,14 @@ import kotlinx.coroutines.test.runBlockingTest
 import news.app.com.domain.GetNewsUsecase
 import news.app.com.domain.models.NetworkResult
 import news.app.com.domain.models.NewsModel
-import news.app.com.ui.ImageMapper
+import news.app.com.test.factory.DataFactory
 import news.app.com.ui.NewsMapper
+import news.app.com.ui.SourceMapper
 import news.app.com.ui.getOrAwaitValue
 import news.app.com.ui.news.viewnews.NewsViewModel
 import news.app.com.ui.test.factory.NewsDataFactory
 import news.app.com.ui.models.Result
+import news.app.com.ui.utils.getUTCDateTimeFormatter
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -23,6 +25,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.robolectric.annotation.Config
+import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [Build.VERSION_CODES.P])
@@ -31,7 +34,7 @@ class NewsViewModelTest {
     @get:Rule val instantExecutorRule = InstantTaskExecutorRule()
 
     private val getNewsUsecase = mock(GetNewsUsecase::class.java)
-    private val newsMapper = NewsMapper(ImageMapper())
+    private val newsMapper = NewsMapper(DataFactory.getLocale().getUTCDateTimeFormatter(), SourceMapper())
 
     private lateinit var newsViewModel: NewsViewModel
 

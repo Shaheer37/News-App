@@ -1,9 +1,11 @@
 package news.app.com.ui.injection.components
 
+import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjectionModule
 import news.app.com.ui.App
 import news.app.com.ui.injection.modules.*
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Singleton
@@ -17,10 +19,14 @@ import javax.inject.Singleton
     ]
 )
 interface AppComponent {
+    companion object{
+        public const val ARTICLE_DATE_FORMATTER = "articleDateFormatter"
+        public const val CONTEXT = "appContext"
+    }
 
     @Component.Factory
     interface Factory{
-        fun create(): AppComponent
+        fun create(@BindsInstance app: App): AppComponent
     }
 
     fun inject(app: App)

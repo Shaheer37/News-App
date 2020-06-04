@@ -10,19 +10,9 @@ interface NewsDao{
     @Insert
     fun insertNews(news:News)
 
-    @Insert
-    fun insertMedia(media: Media): Long
-
-    @Insert
-    fun insertMetadata(metadata: MediaMetadata): Long
-
     @Transaction
     @Query("select * from News")
-    fun getNews(): List<NewsDetails>
-
-    @Transaction
-    @Query("select * from Media")
-    fun getMedia(): List<MediaDetails>
+    fun getNews(): List<News>
 
     @Query("delete from News")
     fun deleteNews()

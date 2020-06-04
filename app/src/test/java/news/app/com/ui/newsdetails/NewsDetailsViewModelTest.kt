@@ -24,7 +24,8 @@ class NewsDetailsViewModelTest {
 
         Assert.assertEquals(news.title, newsDetailsViewModel.newsTitle.getOrAwaitValue())
         Assert.assertEquals(news.summary, newsDetailsViewModel.newsSummary.getOrAwaitValue())
-        Assert.assertEquals(news.articleImage, newsDetailsViewModel.newsImage.getOrAwaitValue())
+        Assert.assertEquals(news.image, newsDetailsViewModel.newsImage.getOrAwaitValue())
+        Assert.assertEquals(news.getImageDescription(), newsDetailsViewModel.newsImageDescription.getOrAwaitValue())
 
         newsDetailsViewModel.onArticleLinkClicked()
         Assert.assertEquals(news.articleUrl, newsDetailsViewModel.onOpenNewsArticle.getOrAwaitValue().peekContent())

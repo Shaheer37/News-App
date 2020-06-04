@@ -1,10 +1,12 @@
 package news.app.com.ui.test.factory
 
-import news.app.com.domain.models.ImageModel
+import android.provider.ContactsContract
 import news.app.com.domain.models.NewsModel
+import news.app.com.domain.models.SourceModel
 import news.app.com.test.factory.DataFactory
-import news.app.com.ui.models.Image
 import news.app.com.ui.models.News
+import news.app.com.ui.models.Source
+import java.util.*
 
 object NewsDataFactory {
 
@@ -15,15 +17,15 @@ object NewsDataFactory {
             summary = DataFactory.randomString(),
             publishedDate = DataFactory.randomDate(),
             writer = DataFactory.randomString(),
-            thumbImage = makeImageModel(),
-            articleImage = makeImageModel()
+            image = DataFactory.randomLink(),
+            source = makeSourceModel()
         )
     }
 
-    fun makeImageModel(): ImageModel{
-        return ImageModel(
-            url = makeRandomImageUrl(),
-            caption = DataFactory.randomString()
+    fun makeSourceModel(): SourceModel {
+        return SourceModel(
+            id = DataFactory.randomString(),
+            name = DataFactory.randomString()
         )
     }
 
@@ -32,15 +34,17 @@ object NewsDataFactory {
             title = DataFactory.randomString(),
             summary = DataFactory.randomString(),
             articleUrl = makeRandomArticleUrl(),
-            thumbImage = makeImage(),
-            articleImage = makeImage()
+            writer = DataFactory.randomString(),
+            publishedDate = Date(),
+            image = makeRandomImageUrl(),
+            source = makeSource()
         )
     }
 
-    fun makeImage(): Image {
-        return Image(
-            url = makeRandomImageUrl(),
-            caption = DataFactory.randomString()
+    fun makeSource(): Source {
+        return Source(
+            id = DataFactory.randomString(),
+            name = DataFactory.randomString()
         )
     }
     fun makeRandomImageUrl():String{

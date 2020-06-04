@@ -43,6 +43,10 @@ android {
     testOptions.unitTests {
         includeAndroidResources = true
     }
+
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
 }
 
 dependencies {

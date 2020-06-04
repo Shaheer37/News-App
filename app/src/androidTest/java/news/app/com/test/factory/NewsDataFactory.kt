@@ -1,9 +1,10 @@
 package news.app.com.test.factory
 
-import news.app.com.domain.models.ImageModel
 import news.app.com.domain.models.NewsModel
-import news.app.com.ui.models.Image
+import news.app.com.domain.models.SourceModel
 import news.app.com.ui.models.News
+import news.app.com.ui.models.Source
+import java.util.*
 
 object NewsDataFactory {
 
@@ -14,15 +15,15 @@ object NewsDataFactory {
             summary = DummyDataFactory.randomString(),
             publishedDate = DummyDataFactory.randomDate(),
             writer = DummyDataFactory.randomString(),
-            thumbImage = makeImageModel(),
-            articleImage = makeImageModel()
+            image = makeRandomImageUrl(),
+            source = makeSourceModel()
         )
     }
 
-    fun makeImageModel(): ImageModel{
-        return ImageModel(
-            url = makeRandomImageUrl(),
-            caption = DummyDataFactory.randomString()
+    fun makeSourceModel(): SourceModel{
+        return SourceModel(
+            id = DummyDataFactory.randomString(),
+            name = DummyDataFactory.randomString()
         )
     }
 
@@ -31,24 +32,17 @@ object NewsDataFactory {
             title = DummyDataFactory.randomString(),
             summary = DummyDataFactory.randomString(),
             articleUrl = articleLink,
-            thumbImage = makeImage(),
-            articleImage = makeImage()
-        )
-    }
-    fun makeNews(): News {
-        return News(
-            title = DummyDataFactory.randomString(),
-            summary = DummyDataFactory.randomString(),
-            articleUrl = makeRandomArticleUrl(),
-            thumbImage = makeImage(),
-            articleImage = makeImage()
+            publishedDate = Date(),
+            writer = DummyDataFactory.randomString(),
+            image = makeRandomImageUrl(),
+            source = makeSource()
         )
     }
 
-    fun makeImage(): Image {
-        return Image(
-            url = makeRandomImageUrl(),
-            caption = DummyDataFactory.randomString()
+    fun makeSource(): Source {
+        return Source(
+            id = DummyDataFactory.randomString(),
+            name = DummyDataFactory.randomString()
         )
     }
 
