@@ -12,11 +12,11 @@ data class NewsResponse(
 data class NewsEntity(
     var id: String = "",
     var title: String = "",
-    var description: String = "",
+    var description: String? = null,
     var author: String? = null,
     var url: String = "",
     @SerializedName("publishedAt") var publishedDate: String = "",
-    @SerializedName("urlToImage") var imageUrl: String = "",
+    @SerializedName("urlToImage") var imageUrl: String? = null,
     var source: SourceEntity? = null
 )
 

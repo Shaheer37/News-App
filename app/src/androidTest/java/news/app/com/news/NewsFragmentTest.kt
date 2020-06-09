@@ -15,7 +15,7 @@ import news.app.com.domain.models.NewsModel
 import news.app.com.test.factory.NewsDataFactory
 import news.app.com.ui.NewsMapper
 import news.app.com.ui.news.viewnews.NewsViewModel
-import news.app.com.domain.models.NetworkResult
+import news.app.com.domain.models.DataResult
 import news.app.com.ui.news.viewnews.NewsFragmentDirections
 import org.junit.Before
 import org.junit.Test
@@ -25,7 +25,6 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.matcher.ViewMatchers.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
-import news.app.com.data.retrofit.DataFactory
 import news.app.com.test.factory.DummyDataFactory
 import news.app.com.ui.SourceMapper
 import news.app.com.ui.injection.ViewModelFactory
@@ -91,7 +90,7 @@ class NewsFragmentTest {
     }
 
     suspend fun stubGetNewsUsecase(news: List<NewsModel>) {
-        `when`(getNewsUsecase()).thenReturn(NetworkResult.Success(news))
+        `when`(getNewsUsecase()).thenReturn(DataResult.Success(news))
     }
 
 }

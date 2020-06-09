@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.paging.PagedList
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_news.*
 import news.app.com.R
@@ -64,8 +65,20 @@ open class NewsFragment: Fragment(), OnNewsClickedEventListener{
 
         retry_btn.setOnClickListener { getNews() }
 
+        viewModel.loadingNews.observe(viewLifecycleOwner, EventObserver{news_swipe_refresh.isRefreshing = it})
+
         viewModel.news.observe(viewLifecycleOwner, Observer{
-            handleRowUpdate(it)
+            news_swipe_refresh.isRefreshing = false
+            submitlist(it)
+            showFirstItemIfTable(it.snapshot())
+            viewModel.setErrorLayoutVisibility(isVisible = false)
+        })
+
+        viewModel.error.observe(viewLifecycleOwner, EventObserver{
+            news_swipe_refresh.isRefreshing = false
+            if(adapter.itemCount<=0) viewModel.setErrorLayoutVisibility(isVisible = true)
+            else context?.toast(getString(R.string.get_news_fail))
+            EspressoIdlingResource.decrement()
         })
 
         viewModel.isErrorLayoutVisible.observe(viewLifecycleOwner, EventObserver{isVisible->
@@ -86,25 +99,7 @@ open class NewsFragment: Fragment(), OnNewsClickedEventListener{
         viewModel.getNews()
     }
 
-    private fun handleRowUpdate(newsUpdate: Result<List<News>>){
-        when(newsUpdate){
-            is Result.Loading -> news_swipe_refresh.isRefreshing = true
-            is Result.Error -> {
-                news_swipe_refresh.isRefreshing = false
-                if(adapter.itemCount<=0) viewModel.setErrorLayoutVisibility(isVisible = true)
-                else context?.toast(getString(R.string.get_news_fail))
-                EspressoIdlingResource.decrement()
-            }
-            is Result.Success -> {
-                news_swipe_refresh.isRefreshing = false
-                submitlist(newsUpdate.data)
-                showFirstItemIfTable(newsUpdate.data)
-                viewModel.setErrorLayoutVisibility(isVisible = false)
-            }
-        }
-    }
-
-    private fun submitlist(newsList: List<News>){
+    private fun submitlist(newsList: PagedList<News>){
         adapter.submitList(newsList){
             EspressoIdlingResource.decrement()
         }

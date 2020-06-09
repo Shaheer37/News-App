@@ -7,10 +7,10 @@ import news.app.com.test.factory.DataFactory
 
 object NewsDataFactory {
 
-    fun makeNewsResponse(totalResults: Int, newsList: List<NewsEntity>): NewsResponse{
+    fun makeNewsResponse(newsList: List<NewsEntity>): NewsResponse{
         return NewsResponse(
-            status = "OK",
-            totalResults = totalResults,
+            status = "ok",
+            totalResults = newsList.size,
             articles = newsList
         )
     }
@@ -31,10 +31,58 @@ object NewsDataFactory {
         )
     }
 
+    fun makeNewsEntityNoSource(): NewsEntity {
+        return NewsEntity(
+            title = DataFactory.randomString(),
+            description = DataFactory.randomString(),
+            author = null,
+            publishedDate = DataFactory.randomDate(),
+            url = makeRandomArticleUrl(),
+            imageUrl = DataFactory.randomLink(),
+            source = null
+        )
+    }
+
+    fun makeNewsEntityNullSourceId(): NewsEntity {
+        return NewsEntity(
+            title = DataFactory.randomString(),
+            description = DataFactory.randomString(),
+            author = DataFactory.randomString(),
+            publishedDate = DataFactory.randomDate(),
+            url = makeRandomArticleUrl(),
+            imageUrl = DataFactory.randomLink(),
+            source = makeNewsSourceEntityNullId()
+        )
+    }
+    fun makeNewsEntityNullSourceName(): NewsEntity {
+        return NewsEntity(
+            title = DataFactory.randomString(),
+            description = DataFactory.randomString(),
+            author = DataFactory.randomString(),
+            publishedDate = DataFactory.randomDate(),
+            url = makeRandomArticleUrl(),
+            imageUrl = DataFactory.randomLink(),
+            source = makeNewsSourceEntityNullName()
+        )
+    }
+
     fun makeNewsSourceEntity(): SourceEntity {
         return SourceEntity(
                 id = DataFactory.randomString(),
                 name = DataFactory.randomString()
+        )
+    }
+    fun makeNewsSourceEntityNullId(): SourceEntity {
+        return SourceEntity(
+                id = null,
+                name = DataFactory.randomString()
+        )
+    }
+
+    fun makeNewsSourceEntityNullName(): SourceEntity {
+        return SourceEntity(
+                id = DataFactory.randomString(),
+                name = null
         )
     }
 

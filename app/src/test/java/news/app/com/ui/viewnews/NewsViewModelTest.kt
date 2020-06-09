@@ -7,7 +7,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import news.app.com.domain.GetNewsUsecase
-import news.app.com.domain.models.NetworkResult
+import news.app.com.domain.models.DataResult
 import news.app.com.domain.models.NewsModel
 import news.app.com.test.factory.DataFactory
 import news.app.com.ui.NewsMapper
@@ -25,7 +25,6 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.robolectric.annotation.Config
-import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [Build.VERSION_CODES.P])
@@ -78,9 +77,9 @@ class NewsViewModelTest {
     }
 
     fun stubGetNewsUsecase(news: List<NewsModel>) = runBlocking{
-        `when`(getNewsUsecase.invoke()).thenReturn(NetworkResult.Success(news))
+        `when`(getNewsUsecase.invoke()).thenReturn(DataResult.Success(news))
     }
     fun stubGetNewsUsecaseError(exception: Exception) = runBlocking{
-        `when`(getNewsUsecase.invoke()).thenReturn(NetworkResult.Error(exception))
+        `when`(getNewsUsecase.invoke()).thenReturn(DataResult.Error(exception))
     }
 }

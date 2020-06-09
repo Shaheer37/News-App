@@ -7,6 +7,7 @@ import news.app.com.domain.models.SourceModel
 import news.app.com.ui.injection.components.AppComponent
 import news.app.com.ui.models.News
 import news.app.com.ui.models.Source
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -22,18 +23,26 @@ class SourceMapper @Inject constructor():Mapper<Source, SourceModel>{
     }
 }
 
-class NewsMapper(
+class NewsMapper @Inject constructor(
         private val simpleDateFormat: SimpleDateFormat,
         private val sourceMapper: SourceMapper
 ):Mapper<News, NewsModel>{
 
     override fun mapToView(d: NewsModel): News {
+        val publishedDate = d.publishedDate?.let {
+            try {
+                simpleDateFormat.parse(it)
+            }catch (e: ParseException){
+                e.printStackTrace()
+                null
+            }
+        }
         return News(
             title = d.title,
             summary = d.summary,
             articleUrl = d.url,
             image = d.image,
-            publishedDate = simpleDateFormat.parse(d.publishedDate)?: Date(),
+            publishedDate = publishedDate,
             writer = d.writer?:"",
             source = d.source?.let { sourceMapper.mapToView(it) }
         )

@@ -28,9 +28,9 @@ class NewsDetailViewModel @Inject constructor(): ViewModel() {
 
     fun setNewsData(news: News){
         _newsTitle.value = news.title
-        _newsSummary.value = news.summary
+        news.summary?.let { _newsSummary.value = it }
         newsArticleLink = news.articleUrl
-        _newsImage.value = news.image
+        news.image?.let {_newsImage.value = it }
         _newsImageDescription.value = news.getImageDescription()
     }
 

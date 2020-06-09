@@ -6,6 +6,8 @@ import java.util.concurrent.ThreadLocalRandom
 
 object DataFactory {
 
+    public const val dateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'"
+
     fun getLocale() = Locale.US;
 
     fun randomString():String{
@@ -13,7 +15,7 @@ object DataFactory {
     }
 
     fun randomDate(): String{
-        return SimpleDateFormat("yyyy-MM-ddTHH:mm:ssZ").format(Date())
+        return SimpleDateFormat(dateFormat).format(Date())
     }
 
     fun randomYear(): Int {

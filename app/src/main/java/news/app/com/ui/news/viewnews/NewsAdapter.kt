@@ -3,6 +3,7 @@ package news.app.com.ui.news.viewnews
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -10,9 +11,10 @@ import kotlinx.android.extensions.LayoutContainer
 import kotlinx.android.synthetic.main.row_news.*
 import news.app.com.R
 import news.app.com.ui.models.News
+import timber.log.Timber
 import javax.inject.Inject
 
-class NewsAdapter @Inject constructor(private val onNewsClickedEventListener: OnNewsClickedEventListener): ListAdapter<News, NewsAdapter.NewsHolder>(NewsDiffCallback()) {
+class NewsAdapter @Inject constructor(private val onNewsClickedEventListener: OnNewsClickedEventListener): PagedListAdapter<News, NewsAdapter.NewsHolder>(NewsDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -25,8 +27,8 @@ class NewsAdapter @Inject constructor(private val onNewsClickedEventListener: On
     }
 
     inner class NewsHolder(override val containerView: View): RecyclerView.ViewHolder(containerView), LayoutContainer {
-        fun bind(){
-            val news = getItem(adapterPosition)
+        fun bind() = getItem(adapterPosition)?.let { news ->
+//            Timber.d(news.toString())
             news_title.text = news.title
             news_image.setImageURI(news.image)
             news_image.contentDescription = news.getImageDescription()
@@ -46,7 +48,7 @@ class NewsDiffCallback : DiffUtil.ItemCallback<News>() {
             oldItem.articleUrl == newItem.articleUrl &&
             oldItem.image == newItem.image &&
             oldItem.writer == newItem.writer &&
-            oldItem.publishedDate.compareTo(newItem.publishedDate) == 0 &&
+            oldItem.publishedDate?.compareTo(newItem.publishedDate) == 0 &&
             oldItem.source?.id == newItem.source?.id &&
             oldItem.source?.name == newItem.source?.name
     }

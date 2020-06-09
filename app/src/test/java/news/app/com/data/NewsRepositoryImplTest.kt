@@ -33,11 +33,11 @@ class NewsRepositoryImplTest {
     fun getNewsTest() = runBlockingTest{
         val newsEntities = listOf(
             NewsDataFactory.makeNewsEntity(),
-            NewsDataFactory.makeNewsEntity(),
-            NewsDataFactory.makeNewsEntity()
+            NewsDataFactory.makeNewsEntityNullSourceId(),
+            NewsDataFactory.makeNewsEntityNoSource()
         )
 
-        val expectedNewsModels = newsEntities.map { newsMapper.mapToDomain(it) }
+        val expectedNewsModels = newsEntities.map { newsMapper.map(it) }
         stubNewsServiceGetNews(newsEntities)
 
         val actualNewsModels = newsRepositoryImpl.getNews()
@@ -60,7 +60,7 @@ class NewsRepositoryImplTest {
     }
 
     suspend fun stubNewsServiceGetNews(newsList: List<NewsEntity>) {
-        `when`(newsService.getNews()).thenReturn(NewsDataFactory.makeNewsResponse(newsList.size, newsList))
+        `when`(newsService.getNews()).thenReturn(NewsDataFactory.makeNewsResponse(newsList))
     }
 
 

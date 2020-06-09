@@ -3,14 +3,12 @@ package news.app.com.domain
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
-import news.app.com.domain.models.NetworkResult
+import news.app.com.domain.models.DataResult
 import news.app.com.domain.models.NewsModel
 import news.app.com.domain.test.factory.NewsModelFactory
 import news.app.com.ui.TestThread
 import org.junit.Assert.*
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.ExpectedException
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import org.mockito.Mockito.*
@@ -29,7 +27,7 @@ class GetNewsUsecaseImplTest{
         val newsModel = NewsModelFactory.makeNewsModel()
         stubNewsRepostory(listOf(newsModel))
 
-        val expectedResult = NetworkResult.Success(listOf(newsModel))
+        val expectedResult = DataResult.Success(listOf(newsModel))
         val actualResult = newsUsecaseImpl()
 
         assertEquals(expectedResult, actualResult)
@@ -43,7 +41,7 @@ class GetNewsUsecaseImplTest{
 
         stubNewsRepostoryThrows(exception)
 
-        assertEquals(NetworkResult.Error(exception), newsUsecaseImpl())
+        assertEquals(DataResult.Error(exception), newsUsecaseImpl())
     }
 
     fun stubNewsRepostory(returnData: List<NewsModel>) = runBlocking{

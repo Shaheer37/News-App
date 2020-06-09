@@ -49,7 +49,7 @@ class TestNewsDetailsFragment {
         onView(withId(R.id.news_summary)).check(matches(withText(news.summary)))
         onView(withId(R.id.news_article_link_btn)).check(matches(isDisplayed()))
         onView(withId(R.id.news_image)).check(matches(isDisplayed()))
-        onView(withId(R.id.news_image)).check(matches(withContentDescription(news.articleImage!!.caption)))
+        onView(withId(R.id.news_image)).check(matches(withContentDescription(news.getImageDescription())))
 
         onView(withId(R.id.news_article_link_btn)).perform(click())
 

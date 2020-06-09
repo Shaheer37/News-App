@@ -8,8 +8,15 @@ import retrofit2.http.Headers
 import retrofit2.http.Query
 
 interface NewsService{
+    companion object {
+        const val RESPONSE_PAGE_SIZE = 10
+    }
 //    @GET("nl6jh")
     @GET("top-headlines")
     @Headers("X-Api-Key: ${BuildConfig.NewsApiKey}")
-    suspend fun getNews(@Query("country") countryCode: String="US"): NewsResponse
+    suspend fun getNews(
+        @Query("country") countryCode: String="US",
+        @Query("pageSize") pageSize: Int = RESPONSE_PAGE_SIZE,
+        @Query("page") page: Int
+    ): NewsResponse
 }

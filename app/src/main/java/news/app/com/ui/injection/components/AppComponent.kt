@@ -13,9 +13,9 @@ import javax.inject.Singleton
     modules = [
         AndroidInjectionModule::class,
         UiModule::class,
-        PresentationModule::class,
+        DomainModule::class,
         DataModule::class,
-        DomainModule::class
+        PresentationModule::class
     ]
 )
 interface AppComponent {

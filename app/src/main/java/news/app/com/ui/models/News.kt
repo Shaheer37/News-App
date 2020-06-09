@@ -8,11 +8,11 @@ import java.util.*
 @Parcelize
 data class News(
     val title: String,
-    val summary: String,
+    val summary: String?,
     val articleUrl: String,
-    val image: String,
-    val publishedDate: Date,
-    val writer: String,
+    val image: String?,
+    val publishedDate: Date?,
+    val writer: String?,
     val source: Source?
 ):Parcelable{
     fun getImageDescription(): String

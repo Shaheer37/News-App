@@ -4,14 +4,13 @@ import androidx.room.*
 
 @Entity
 data class News(
-        @PrimaryKey(autoGenerate = true) var newsId: Long = 0,
-        var title: String = "",
-        var description: String = "",
+         @PrimaryKey var title: String = "",
+        var description: String? = null,
         var url: String = "",
-        var author: String = "",
-        var publishedDate: String = "",
-        var imageUrl: String = "",
-        @Embedded var source: Source = Source()
+        var author: String? = null,
+        var publishedDate: String? = null,
+        var imageUrl: String? = null,
+        @Embedded var source: Source? = null
 )
 
 data class Source(
