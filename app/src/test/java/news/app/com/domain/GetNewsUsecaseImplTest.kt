@@ -23,32 +23,8 @@ class GetNewsUsecaseImplTest{
     @Test
     @ExperimentalCoroutinesApi
     fun testNewsUsecase_successfulcase() = runBlockingTest{
+        newsUsecaseImpl()
 
-        val newsModel = NewsModelFactory.makeNewsModel()
-        stubNewsRepostory(listOf(newsModel))
-
-        val expectedResult = DataResult.Success(listOf(newsModel))
-        val actualResult = newsUsecaseImpl()
-
-        assertEquals(expectedResult, actualResult)
-    }
-
-    @Test
-    @ExperimentalCoroutinesApi
-    fun testNewsUsecase_failedcase() = runBlockingTest{
-
-        val exception = Exception()
-
-        stubNewsRepostoryThrows(exception)
-
-        assertEquals(DataResult.Error(exception), newsUsecaseImpl())
-    }
-
-    fun stubNewsRepostory(returnData: List<NewsModel>) = runBlocking{
-        `when`(newsRepository.getNews()).thenReturn(returnData)
-    }
-
-    fun stubNewsRepostoryThrows(exception: java.lang.Exception) = runBlocking{
-        doAnswer{throw exception}.`when`(newsRepository).getNews()
+        verify(newsRepository).getNews()
     }
 }

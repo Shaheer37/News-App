@@ -34,6 +34,7 @@ class TestNewsDetailsFragment {
         Intents.release()
     }
 
+
     @Test
     fun testNewsDetailsFragment(){
         val news = NewsDataFactory.makeNewsWith(

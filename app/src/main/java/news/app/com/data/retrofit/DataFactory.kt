@@ -3,6 +3,8 @@ package news.app.com.data.retrofit
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import news.app.com.data.NewsEntity
+import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -12,12 +14,12 @@ object DataFactory{
 
     private const val BASE_URL = "https://newsapi.org/v2/"
 
-    fun makeService(showLogs: Boolean = true): NewsService {
+    fun makeService(baseUrl: HttpUrl = BASE_URL.toHttpUrl(), showLogs: Boolean = true): NewsService {
         val okHttpClient = makeOkHttpClient(makeLoggingInterceptor(showLogs))
-        return makeService(BASE_URL, okHttpClient)
+        return makeService(baseUrl, okHttpClient)
     }
 
-    private fun makeService(baseUrl: String, okHttpClient: OkHttpClient): NewsService {
+    private fun makeService(baseUrl: HttpUrl, okHttpClient: OkHttpClient): NewsService {
 
         val retrofit = Retrofit.Builder()
             .baseUrl(baseUrl)

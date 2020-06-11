@@ -35,7 +35,6 @@ class NewsDaoTest {
     @Test
     fun testInsertNewsAndGetNewsDetails(){
         val news = News(
-                7153292,
                 "SpaceX Launch: Highlights From the Weather-Delayed Mission",
                 "Follow SpaceX's launch of NASA astronauts aboard the Crew Dragon spacecraft.",
                 "https://www.nytimes.com/2020/05/27/science/spacex-launch-nasa.html",
@@ -49,22 +48,21 @@ class NewsDaoTest {
         )
         database.newsDao().insertNews(news)
 
-        val newsList = database.newsDao().getNews()
+        val newsList = database.newsDao().getNewsList()
         Assert.assertEquals(1, newsList.size)
         for(dbNews in newsList){
-            Assert.assertEquals(news.newsId, dbNews.newsId)
             Assert.assertEquals(news.title, dbNews.title)
             Assert.assertEquals(news.description, dbNews.description)
             Assert.assertEquals(news.url, dbNews.url)
             Assert.assertEquals(news.author, dbNews.author)
             Assert.assertEquals(news.publishedDate, dbNews.publishedDate)
             Assert.assertEquals(news.imageUrl, dbNews.imageUrl)
-            Assert.assertEquals(news.source.sourceId, dbNews.source.sourceId)
-            Assert.assertEquals(news.source.sourceName, dbNews.source.sourceName)
+            Assert.assertEquals(news.source!!.sourceId, dbNews.source!!.sourceId)
+            Assert.assertEquals(news.source!!.sourceName, dbNews.source!!.sourceName)
         }
 
         database.newsDao().deleteNews()
-        val noNews = database.newsDao().getNews()
+        val noNews = database.newsDao().getNewsList()
         Assert.assertEquals(0, noNews.size)
     }
 

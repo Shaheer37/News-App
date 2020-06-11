@@ -50,8 +50,6 @@ class NavigationTest {
         onView(withId(R.id.news_image)).check(matches(isDisplayed()))
         onView(withId(R.id.news_article_link_btn)).check(matches(isDisplayed()))
     }
-
-
 }
 
 class RecyclerViewItemCount(private val matcher: Matcher<Int>): ViewAssertion{

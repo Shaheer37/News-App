@@ -14,8 +14,11 @@ interface NewsDao{
     @Transaction
     @Query("select * from News")
     fun getNews(): DataSource.Factory<Int, News>
-//    fun getNews(): List<News>
+
+    @Transaction
+    @Query("select * from News")
+    fun getNewsList(): List<News>
 
     @Query("delete from News")
-    fun deleteNews()
+    fun deleteNews(): Int
 }

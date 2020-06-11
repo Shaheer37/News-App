@@ -11,6 +11,7 @@ import news.app.com.domain.models.NewsModel
 import news.app.com.ui.Event
 import news.app.com.ui.NewsMapper
 import news.app.com.ui.models.News
+import timber.log.Timber
 import javax.inject.Inject
 
 class NewsViewModel @Inject constructor(
@@ -48,6 +49,11 @@ class NewsViewModel @Inject constructor(
                 newsMapper.mapToView(it)
             }
         }
+    }
+
+    fun refreshNews(){
+        Timber.d("refreshNews()")
+        newsBoundaryCallback.onZeroItemsLoaded()
     }
 
     fun setErrorLayoutVisibility(isVisible: Boolean){

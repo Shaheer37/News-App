@@ -2,47 +2,57 @@ package news.app.com.data
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
+import news.app.com.data.persistence.News
+import news.app.com.data.persistence.NewsDao
+import news.app.com.data.persistence.NewsDatabase
 import news.app.com.data.retrofit.NewsService
 import news.app.com.data.test.factory.NewsDataFactory
 import org.junit.Test
 
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Rule
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.mock
 import java.io.IOException
 import org.junit.rules.ExpectedException
-
+import org.mockito.Mockito.*
 
 
 @RunWith(JUnit4::class)
 class NewsRepositoryImplTest {
 
     private val newsMapper = NewsMapper(SourceMapper())
+    private val newsDbMapper = NewsDbMapper(SourceDbMapper())
     private val newsService = mock(NewsService::class.java)
+    private val newsDatabase = mock(NewsDatabase::class.java)
+    private val newsDao = mock(NewsDao::class.java)
 
-    private val newsRepositoryImpl = NewsRepositoryImpl(newsService, newsMapper)
+    private val newsRepositoryImpl = NewsRepositoryImpl(newsDatabase, newsService, newsMapper, newsDbMapper)
 
     val exception = ExpectedException.none()
     @Rule get
 
     @Test
     @ExperimentalCoroutinesApi
-    fun getNewsTest() = runBlockingTest{
+    fun updateNewsTest() = runBlockingTest{
         val newsEntities = listOf(
             NewsDataFactory.makeNewsEntity(),
             NewsDataFactory.makeNewsEntityNullSourceId(),
             NewsDataFactory.makeNewsEntityNoSource()
         )
 
-        val expectedNewsModels = newsEntities.map { newsMapper.map(it) }
+        val expectedNews = newsEntities.map { newsDbMapper.map(it) }
         stubNewsServiceGetNews(newsEntities)
+        stubNewsDao()
+        stubNewsDbDelete()
+        stubInsertNews(expectedNews)
 
-        val actualNewsModels = newsRepositoryImpl.getNews()
+        assertEquals(false, newsRepositoryImpl.updateNews(1))
 
-        assertEquals(expectedNewsModels, actualNewsModels)
+        verify(newsService).getNews(page = 1)
+        verify(newsDao).deleteNews()
+        verify(newsDao).insertAllNews(expectedNews)
     }
 
     @Test
@@ -52,15 +62,27 @@ class NewsRepositoryImplTest {
 
         exception.expect(IOException::class.java)
         exception.expectMessage("Error! Unsuccessful response from server.")
-        newsRepositoryImpl.getNews()
+        newsRepositoryImpl.updateNews(1)
     }
 
     suspend fun stubNewsServiceGetNews_failedScenario() {
-        `when`(newsService.getNews()).thenReturn(NewsDataFactory.makeFailedNewsResponse())
+        `when`(newsService.getNews(page = 1)).thenReturn(NewsDataFactory.makeFailedNewsResponse())
     }
 
     suspend fun stubNewsServiceGetNews(newsList: List<NewsEntity>) {
-        `when`(newsService.getNews()).thenReturn(NewsDataFactory.makeNewsResponse(newsList))
+        `when`(newsService.getNews(page = 1)).thenReturn(NewsDataFactory.makeNewsResponse(newsList))
+    }
+
+    fun stubNewsDao(){
+        `when`(newsDatabase.newsDao()).thenReturn(newsDao)
+    }
+
+    suspend fun stubNewsDbDelete() {
+        `when`(newsDao.deleteNews()).thenReturn(0)
+    }
+
+    suspend fun stubInsertNews(news:List<News>) {
+        doNothing().`when`(newsDao).insertAllNews(news)
     }
 
 

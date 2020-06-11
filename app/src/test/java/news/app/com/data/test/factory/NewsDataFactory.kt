@@ -2,6 +2,8 @@ package news.app.com.data.test.factory
 
 import android.provider.ContactsContract
 import news.app.com.data.*
+import news.app.com.data.persistence.News
+import news.app.com.data.persistence.Source
 import news.app.com.domain.models.SourceModel
 import news.app.com.test.factory.DataFactory
 
@@ -83,6 +85,37 @@ object NewsDataFactory {
         return SourceEntity(
                 id = DataFactory.randomString(),
                 name = null
+        )
+    }
+
+    fun makeNews(): News {
+        return News(
+                title = DataFactory.randomString(),
+                description = DataFactory.randomString(),
+                author = DataFactory.randomString(),
+                publishedDate = DataFactory.randomDate(),
+                url = makeRandomArticleUrl(),
+                imageUrl = DataFactory.randomLink(),
+                source = makeNewsSource()
+        )
+    }
+
+    fun makeNewsNoSource(): News {
+        return News(
+                title = DataFactory.randomString(),
+                description = DataFactory.randomString(),
+                author = null,
+                publishedDate = DataFactory.randomDate(),
+                url = makeRandomArticleUrl(),
+                imageUrl = DataFactory.randomLink(),
+                source = null
+        )
+    }
+
+    fun makeNewsSource(): Source {
+        return Source(
+                sourceId = DataFactory.randomString(),
+                sourceName = DataFactory.randomString()
         )
     }
 

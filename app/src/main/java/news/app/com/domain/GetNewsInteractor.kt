@@ -17,7 +17,8 @@ class GetNewsUsecaseImpl @Inject constructor(
 
 interface GetNewsUsecase {
     suspend operator fun invoke(): DataSource.Factory<Int,NewsModel>
-}/*interface GetNewsUsecase<out T: Any> {
+}
+/*interface GetNewsUsecase<out T: Any> {
     suspend operator fun invoke(): T
 }*/
 

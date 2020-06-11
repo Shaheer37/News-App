@@ -9,7 +9,7 @@ import retrofit2.http.Query
 
 interface NewsService{
     companion object {
-        const val RESPONSE_PAGE_SIZE = 10
+        const val RESPONSE_PAGE_SIZE = 20
     }
 //    @GET("nl6jh")
     @GET("top-headlines")

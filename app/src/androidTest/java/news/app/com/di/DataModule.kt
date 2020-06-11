@@ -1,4 +1,4 @@
-package news.app.com.ui.injection.modules
+package news.app.com.di
 
 import android.content.Context
 import dagger.Binds
@@ -11,6 +11,7 @@ import news.app.com.data.persistence.NewsDatabase
 import news.app.com.data.retrofit.NewsService
 import news.app.com.domain.NewsRepository
 import news.app.com.ui.injection.components.AppComponent
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import javax.inject.Named
 import javax.inject.Singleton
 
@@ -22,7 +23,7 @@ interface DataModule {
         @JvmStatic
         @Singleton
         fun providesNewsService(): NewsService {
-            return DataFactory.makeService(showLogs = BuildConfig.DEBUG)
+            return DataFactory.makeService("http://localhost:8080/".toHttpUrl(), showLogs = BuildConfig.DEBUG)
         }
 
         @Provides

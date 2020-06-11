@@ -27,6 +27,7 @@ class NewsAdapter @Inject constructor(private val onNewsClickedEventListener: On
     }
 
     inner class NewsHolder(override val containerView: View): RecyclerView.ViewHolder(containerView), LayoutContainer {
+
         fun bind() = getItem(adapterPosition)?.let { news ->
 //            Timber.d(news.toString())
             news_title.text = news.title

@@ -6,15 +6,13 @@ import androidx.paging.PagedList
 import kotlinx.coroutines.*
 import news.app.com.domain.GetNewsFromApiUsecase
 import news.app.com.ui.models.News
+import news.app.com.ui.utils.EspressoIdlingResource
 import timber.log.Timber
 import javax.inject.Inject
 
 class NewsBoundaryCallback @Inject constructor(
         private val getNewsFromApi: GetNewsFromApiUsecase
 ):PagedList.BoundaryCallback<News>() {
-    companion object{
-        const val NEWS_PER_PAGE = 20
-    }
 
     private var canFetchMore = true
     private var hasFistLoadedRan = false
@@ -34,12 +32,14 @@ class NewsBoundaryCallback @Inject constructor(
             Timber.d("onItemAtFrontLoaded(itemAtFront: $itemAtFront)")
             hasFistLoadedRan = true
             lastRequestedPage = 1
+            canFetchMore = true
             getNews()
         }
     }
 
     override fun onZeroItemsLoaded() {
         Timber.d("onZeroItemsLoaded()")
+        hasFistLoadedRan = true
         lastRequestedPage = 1
         canFetchMore = true
         getNews()
@@ -55,6 +55,8 @@ class NewsBoundaryCallback @Inject constructor(
         if(_isRequestInProgress.value!!) return
         if(!canFetchMore) return
 
+        EspressoIdlingResource.increment()
+
         GlobalScope.launch(Dispatchers.IO) {
             setRequestProgressStatus(true)
             try{
@@ -66,6 +68,9 @@ class NewsBoundaryCallback @Inject constructor(
                 withContext(Dispatchers.Main) {_networkErrors.value = e.localizedMessage ?: "Error! Something went wrong."}
                 setRequestProgressStatus(false)
             }
+
+            EspressoIdlingResource.decrement()
+
         }
     }
 

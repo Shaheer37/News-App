@@ -14,7 +14,7 @@ android {
         targetSdkVersion 29
         versionCode 1
         versionName "1.0.0"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "news.app.com.AndroidTestRunner"
     }
 
     def props = project.ext
@@ -52,7 +52,7 @@ android {
 dependencies {
     def daggerVersion = "2.25.2"
     def timberVersion = "4.7.1"
-    def okHttpVersion = "4.0.1"
+    def okHttpVersion = "4.7.2"
     def retrofitVersion = "2.6.0"
     def frescoVersion = "2.1.0"
     def gsonVersion = "2.8.5"
@@ -62,9 +62,12 @@ dependencies {
     def roomVersion = "2.2.5"
     def pagingVersion = "2.1.2"
 
+    def mockkVersion = "1.9.3"
+    def mockitoVersion = "3.3.3"
+    def mockwebserverVersion = "4.7.2"
+
     def junitVersion = "4.12"
     def coroutineTestVerion = "1.2.1"
-    def mockitoVersion = "2.25.0"
     def androidXTestCoreVersion = "1.2.0"
     def androidXTestExtKotlinRunnerVersion = "1.1.1"
     def archTestingVersion = "2.0.0"
@@ -128,10 +131,11 @@ dependencies {
     testImplementation "org.robolectric:robolectric:$robolectricVersion"
     testImplementation "org.mockito:mockito-core:$mockitoVersion"
 
-    androidTestImplementation "junit:junit:$junitVersion"
 
     debugImplementation "androidx.fragment:fragment-testing:$fragmentVersion"
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.2'
+
+    kaptAndroidTest "com.google.dagger:dagger-compiler:$daggerVersion"
 
     androidTestImplementation "androidx.test:core:$androidXTestCoreVersion"
     androidTestImplementation "androidx.test:runner:$androidXTestCoreVersion"
@@ -140,6 +144,11 @@ dependencies {
 
     androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineTestVerion"
 
+    androidTestImplementation "junit:junit:$junitVersion"
+
+    androidTestImplementation "com.squareup.okhttp3:mockwebserver:$mockwebserverVersion"
+
+    androidTestImplementation "io.mockk:mockk-android:$mockkVersion"
     androidTestImplementation "org.mockito:mockito-core:$mockitoVersion"
     androidTestImplementation "com.linkedin.dexmaker:dexmaker-mockito:$dexMakerVersion"
 

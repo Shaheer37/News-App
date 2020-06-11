@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -16,7 +17,6 @@ import news.app.com.ui.EventObserver
 import news.app.com.ui.news.newsdetails.NewsDetailFragment
 import news.app.com.ui.injection.ViewModelFactory
 import news.app.com.ui.models.News
-import news.app.com.ui.models.Result
 import news.app.com.ui.utils.EspressoIdlingResource
 import news.app.com.ui.utils.hasFragments
 import news.app.com.ui.utils.replaceFragment
@@ -33,6 +33,7 @@ open class NewsFragment: Fragment(), OnNewsClickedEventListener{
 
     private val isTablet: Boolean by lazy { resources.getBoolean(R.bool.is_tablet) }
 
+    @VisibleForTesting
     open fun injectDependencies(){
         AndroidSupportInjection.inject(this)
     }
@@ -59,18 +60,22 @@ open class NewsFragment: Fragment(), OnNewsClickedEventListener{
         news_list.adapter = adapter
 
         news_swipe_refresh.setOnRefreshListener {
+            Timber.d("setOnRefreshListener()")
             news_swipe_refresh.isRefreshing = true
-            getNews()
+            refreshNews()
         }
 
-        retry_btn.setOnClickListener { getNews() }
+        retry_btn.setOnClickListener {
+            Timber.d("setOnRetryClickListener()")
+            refreshNews()
+        }
 
         viewModel.loadingNews.observe(viewLifecycleOwner, EventObserver{news_swipe_refresh.isRefreshing = it})
 
         viewModel.news.observe(viewLifecycleOwner, Observer{
             news_swipe_refresh.isRefreshing = false
             submitlist(it)
-            showFirstItemIfTable(it.snapshot())
+            showFirstItemIfTablet(it.snapshot())
             viewModel.setErrorLayoutVisibility(isVisible = false)
         })
 
@@ -99,13 +104,17 @@ open class NewsFragment: Fragment(), OnNewsClickedEventListener{
         viewModel.getNews()
     }
 
+    fun refreshNews(){
+        viewModel.refreshNews()
+    }
+
     private fun submitlist(newsList: PagedList<News>){
         adapter.submitList(newsList){
             EspressoIdlingResource.decrement()
         }
     }
 
-    private fun showFirstItemIfTable(newsList: List<News>){
+    private fun showFirstItemIfTablet(newsList: List<News>){
         if(isTablet && newsList.isNotEmpty() && !childFragmentManager.hasFragments()){
             onNewsClicked(newsList.first())
         }
