@@ -8,4 +8,9 @@
 
     <string name="get_news_fail">Failed to retrieve latest news. Please check your network connectivity.</string>
     <string name="tryagain">Try Again</string>
+
+    <string name="permission_rationale">This app needs access to device\'s network state to check its availability while fetching or updating News.</string>
+
+    <string name="retry">Retry</string>
+    <string name="on_permission_denied">The application cannot function without Network access permissions</string>
 </resources>

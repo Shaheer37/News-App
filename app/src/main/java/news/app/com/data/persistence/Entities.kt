@@ -2,6 +2,13 @@ package news.app.com.data.persistence
 
 import androidx.room.*
 
+@Entity(tableName = "remote_keys")
+data class RemoteKeys(
+        @PrimaryKey val newsId: String,
+        val prevKey: Int?,
+        val nextKey: Int?
+)
+
 @Entity
 data class News(
          @PrimaryKey var title: String = "",
@@ -17,3 +24,4 @@ data class Source(
         var sourceId: String = "",
         var sourceName: String = ""
 )
+

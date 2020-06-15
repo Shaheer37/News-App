@@ -1,6 +1,7 @@
 package news.app.com.ui.injection.modules
 
 import android.content.Context
+import androidx.paging.ExperimentalPagingApi
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -16,6 +17,7 @@ import javax.inject.Named
 @Module
 interface NewsFragmentModule {
 
+    @ExperimentalPagingApi
     @Binds
     fun bindsOnNewsClickedEventListener(onNewsClickedEventListener: NewsFragment): OnNewsClickedEventListener
 }

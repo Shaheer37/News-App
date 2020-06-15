@@ -1,6 +1,7 @@
 package news.app.com.ui.utils
 import android.content.Context
 import android.os.Build
+import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -32,4 +33,10 @@ fun Context.getCurrentLocale(): Locale {
 
 fun Locale.getUTCDateTimeFormatter(): SimpleDateFormat{
     return SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", this)
+}
+
+fun toVisibility(constraint: Boolean): Int = if (constraint) {
+    View.VISIBLE
+} else {
+    View.GONE
 }

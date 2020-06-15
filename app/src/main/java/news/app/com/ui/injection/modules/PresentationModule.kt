@@ -7,6 +7,7 @@ import dagger.MapKey
 import dagger.Module
 import dagger.multibindings.IntoMap
 import news.app.com.ui.injection.ViewModelFactory
+import news.app.com.ui.news.MainViewModel
 import news.app.com.ui.news.newsdetails.NewsDetailViewModel
 import news.app.com.ui.news.viewnews.NewsViewModel
 import javax.inject.Provider
@@ -14,6 +15,11 @@ import kotlin.reflect.KClass
 
 @Module
 interface PresentationModule{
+    @Binds
+    @IntoMap
+    @ViewModelKey(MainViewModel::class)
+    fun bindsMainViewModel(viewModel: MainViewModel): ViewModel
+
     @Binds
     @IntoMap
     @ViewModelKey(NewsViewModel::class)

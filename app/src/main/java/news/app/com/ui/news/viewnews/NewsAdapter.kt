@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -14,7 +15,7 @@ import news.app.com.ui.models.News
 import timber.log.Timber
 import javax.inject.Inject
 
-class NewsAdapter @Inject constructor(private val onNewsClickedEventListener: OnNewsClickedEventListener): PagedListAdapter<News, NewsAdapter.NewsHolder>(NewsDiffCallback()) {
+class NewsAdapter @Inject constructor(private val onNewsClickedEventListener: OnNewsClickedEventListener): PagingDataAdapter<News, NewsAdapter.NewsHolder>(NewsDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -23,12 +24,14 @@ class NewsAdapter @Inject constructor(private val onNewsClickedEventListener: On
     }
 
     override fun onBindViewHolder(holder: NewsHolder, position: Int) {
-        holder.bind()
+        holder.bind(getItem(position))
     }
+
+    fun getFirstItem(): News? = if(itemCount>0) getItem(0) else null
 
     inner class NewsHolder(override val containerView: View): RecyclerView.ViewHolder(containerView), LayoutContainer {
 
-        fun bind() = getItem(adapterPosition)?.let { news ->
+        fun bind(news: News?) = news?.let { news ->
 //            Timber.d(news.toString())
             news_title.text = news.title
             news_image.setImageURI(news.image)

@@ -2,9 +2,10 @@ package news.app.com.domain
 
 import androidx.paging.DataSource
 import androidx.paging.PagedList
+import androidx.paging.PagingData
+import kotlinx.coroutines.flow.Flow
 import news.app.com.domain.models.NewsModel
 
 interface NewsRepository {
-    suspend fun getNews(): DataSource.Factory<Int, NewsModel>
-    suspend fun updateNews(page: Int): Boolean
+    fun getNews(): Flow<PagingData<NewsModel>>
 }

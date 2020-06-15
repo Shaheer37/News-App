@@ -6,14 +6,15 @@ import kotlinx.android.parcel.Parcelize
 import java.util.*
 
 @Parcelize
-data class News(
-    val title: String,
-    val summary: String?,
-    val articleUrl: String,
-    val image: String?,
-    val publishedDate: Date?,
-    val writer: String?,
-    val source: Source?
+data class News
+(
+    val title: String = "",
+    val summary: String? = null,
+    val articleUrl: String = "",
+    val image: String? = null,
+    val publishedDate: Date? = null,
+    val writer: String? = "",
+    val source: Source? = null
 ):Parcelable{
     fun getImageDescription(): String
         = "Image from Article: \"${title}\" published by ${source?.name}"

@@ -3,7 +3,6 @@ package news.app.com.news
 import androidx.lifecycle.ViewModel
 import news.app.com.domain.GetNewsUsecase
 import news.app.com.ui.NewsMapper
-import news.app.com.ui.news.viewnews.NewsBoundaryCallback
 import news.app.com.ui.news.viewnews.NewsViewModel
 import javax.inject.Inject
 import javax.inject.Provider

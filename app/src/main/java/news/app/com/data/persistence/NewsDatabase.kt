@@ -7,10 +7,12 @@ import androidx.room.RoomDatabase
 import news.app.com.ui.utils.SingletonHolder
 
 @Database(entities = [
-    News::class
+    News::class,
+    RemoteKeys::class
 ], version = 1, exportSchema = false)
 abstract class NewsDatabase : RoomDatabase() {
     abstract fun newsDao(): NewsDao
+    abstract fun remoteKeysDao(): RemoteKeysDao
 
     companion object: SingletonHolder<NewsDatabase, Context>(creator = {context ->
         Room.databaseBuilder(context.applicationContext,

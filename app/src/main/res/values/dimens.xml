@@ -14,5 +14,7 @@
 
     <dimen name="news_detail_md_view_elevation">4dp</dimen>
 
+    <dimen name="error_text_size">24sp</dimen>
+
 
 </resources>

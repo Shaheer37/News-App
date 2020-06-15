@@ -1,6 +1,7 @@
 package news.app.com.ui.injection.modules
 
 import android.content.Context
+import androidx.paging.ExperimentalPagingApi
 import news.app.com.domain.executor.PostExecutionThread
 import dagger.Binds
 import dagger.Module
@@ -15,6 +16,7 @@ import news.app.com.ui.SourceMapper
 import news.app.com.ui.UiThread
 import news.app.com.ui.injection.components.AppComponent
 import news.app.com.ui.injection.subcomponents.NewsFragmentSubcomponent
+import news.app.com.ui.news.MainActivity
 import news.app.com.ui.news.newsdetails.NewsDetailFragment
 import news.app.com.ui.news.viewnews.NewsFragment
 import news.app.com.ui.utils.getUTCDateTimeFormatter
@@ -22,6 +24,7 @@ import news.app.com.ui.utils.getCurrentLocale
 import java.text.SimpleDateFormat
 import javax.inject.Named
 
+@ExperimentalPagingApi
 @Module(subcomponents = [NewsFragmentSubcomponent::class])
 interface UiModule {
 
@@ -44,6 +47,7 @@ interface UiModule {
     @Named(AppComponent.CONTEXT)
     fun bindsContext(app: App): Context
 
+    @ExperimentalPagingApi
     @Binds
     @IntoMap
     @ClassKey(NewsFragment::class)
@@ -51,6 +55,9 @@ interface UiModule {
 
     @ContributesAndroidInjector
     fun contributesNewsDetailFragment(): NewsDetailFragment
+
+    @ContributesAndroidInjector
+    fun contributesMainActivity(): MainActivity
 
     @Binds
     fun bindsPostExecutionThread(postExecutionThread: UiThread): PostExecutionThread

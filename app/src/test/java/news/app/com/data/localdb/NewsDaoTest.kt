@@ -61,7 +61,7 @@ class NewsDaoTest {
             Assert.assertEquals(news.source!!.sourceName, dbNews.source!!.sourceName)
         }
 
-        database.newsDao().deleteNews()
+        database.newsDao().deleteAllNews()
         val noNews = database.newsDao().getNewsList()
         Assert.assertEquals(0, noNews.size)
     }

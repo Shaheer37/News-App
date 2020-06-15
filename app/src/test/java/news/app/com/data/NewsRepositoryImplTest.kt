@@ -10,7 +10,6 @@ import news.app.com.data.test.factory.NewsDataFactory
 import org.junit.Test
 
 import org.junit.Assert.*
-import org.junit.Before
 import org.junit.Rule
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -51,7 +50,7 @@ class NewsRepositoryImplTest {
         assertEquals(false, newsRepositoryImpl.updateNews(1))
 
         verify(newsService).getNews(page = 1)
-        verify(newsDao).deleteNews()
+        verify(newsDao).deleteAllNews()
         verify(newsDao).insertAllNews(expectedNews)
     }
 
@@ -78,7 +77,7 @@ class NewsRepositoryImplTest {
     }
 
     suspend fun stubNewsDbDelete() {
-        `when`(newsDao.deleteNews()).thenReturn(0)
+        `when`(newsDao.deleteAllNews()).thenReturn(0)
     }
 
     suspend fun stubInsertNews(news:List<News>) {

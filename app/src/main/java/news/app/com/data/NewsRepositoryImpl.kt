@@ -1,9 +1,16 @@
 package news.app.com.data
 
 import androidx.paging.DataSource
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import news.app.com.data.persistence.News
 import news.app.com.data.persistence.NewsDatabase
 import news.app.com.data.retrofit.NewsService
+import news.app.com.data.retrofit.NewsService.Companion.RESPONSE_STATUS_OK
 import news.app.com.domain.models.NewsModel
 import news.app.com.domain.NewsRepository
 import timber.log.Timber
@@ -14,39 +21,12 @@ class NewsRepositoryImpl @Inject constructor(
     private val newsDb: NewsDatabase,
     private val newsService: NewsService,
     private val newsMapper: NewsMapper,
-    private val newsDbMapper: NewsDbMapper
+    private val newsRemoteMediator: NewsRemoteMediator
 ): NewsRepository {
 
-    override suspend fun getNews(): DataSource.Factory<Int, NewsModel> {
-        return newsDb.newsDao().getNews().map { newsMapper.map(it) }
-    }
-
-    override suspend fun updateNews(page: Int): Boolean {
-        try{
-            newsService.getNews(page = page).run {
-                Timber.d(this.toString())
-                if (status == "ok"){
-                    if(page == 1) newsDb.newsDao().deleteNews()
-                    val dbNews = articles.map { newsDbMapper.map(it) }
-                    newsDb.newsDao().insertAllNews(dbNews)
-
-                    return articles.size >= NewsService.RESPONSE_PAGE_SIZE
-                }else{
-                    throw IOException("Error! Unsuccessful response from server.")
-                }
-            }
-        }catch (exception: Exception){
-            exception.printStackTrace()
-            throw exception
-        }
-    }
-
-    /*    override suspend fun getNews(): List<NewsModel> = newsService.getNews().run {
-            Timber.d(this.toString())
-            return if(status == "ok") articles.map {
-                newsMapper.map(it)
-            }
-
-            else throw IOException("Error! Unsuccessful response from server.")
-        }*/
+    override fun getNews(): Flow<PagingData<NewsModel>> = Pager(
+            config = PagingConfig(pageSize = NewsService.RESPONSE_PAGE_SIZE),
+            remoteMediator = newsRemoteMediator,
+            pagingSourceFactory = {newsDb.newsDao().getNewsSource()}
+    ).flow.map{pagingData-> pagingData.map { newsMapper.map(it) }}
 }

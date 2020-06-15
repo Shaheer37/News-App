@@ -1,6 +1,7 @@
 package news.app.com.ui.injection.modules
 
 import android.content.Context
+import androidx.paging.ExperimentalPagingApi
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -15,15 +16,17 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
+@ExperimentalPagingApi
 interface DataModule {
     @Module
     companion object{
         @Provides
         @JvmStatic
         @Singleton
-        fun providesNewsService(): NewsService {
-            return DataFactory.makeService(showLogs = BuildConfig.DEBUG)
+        fun providesNewsService(@Named(AppComponent.CONTEXT) context: Context): NewsService {
+            return DataFactory.makeService(context = context,showLogs = BuildConfig.DEBUG)
         }
+
 
         @Provides
         @JvmStatic

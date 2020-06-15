@@ -4,26 +4,38 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.LoadState
 import androidx.paging.PagedList
+import androidx.paging.PagingData
+import androidx.recyclerview.widget.RecyclerView
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_news.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import news.app.com.R
 import news.app.com.ui.EventObserver
 import news.app.com.ui.news.newsdetails.NewsDetailFragment
 import news.app.com.ui.injection.ViewModelFactory
 import news.app.com.ui.models.News
-import news.app.com.ui.utils.EspressoIdlingResource
-import news.app.com.ui.utils.hasFragments
-import news.app.com.ui.utils.replaceFragment
-import news.app.com.ui.utils.toast
+import news.app.com.ui.news.MainViewModel
+import news.app.com.ui.utils.*
 import timber.log.Timber
 import javax.inject.Inject
 
+@ExperimentalPagingApi
+@ExperimentalCoroutinesApi
 open class NewsFragment: Fragment(), OnNewsClickedEventListener{
 
     @Inject lateinit var viewModel: NewsViewModel
@@ -32,6 +44,8 @@ open class NewsFragment: Fragment(), OnNewsClickedEventListener{
     @Inject lateinit var adapter: NewsAdapter
 
     private val isTablet: Boolean by lazy { resources.getBoolean(R.bool.is_tablet) }
+
+    private var newsJob: Job? = null
 
     @VisibleForTesting
     open fun injectDependencies(){
@@ -54,14 +68,14 @@ open class NewsFragment: Fragment(), OnNewsClickedEventListener{
         news_list.adapter = null
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        news_list.adapter = adapter
+        initAdapter()
 
         news_swipe_refresh.setOnRefreshListener {
             Timber.d("setOnRefreshListener()")
-            news_swipe_refresh.isRefreshing = true
             refreshNews()
         }
 
@@ -69,22 +83,6 @@ open class NewsFragment: Fragment(), OnNewsClickedEventListener{
             Timber.d("setOnRetryClickListener()")
             refreshNews()
         }
-
-        viewModel.loadingNews.observe(viewLifecycleOwner, EventObserver{news_swipe_refresh.isRefreshing = it})
-
-        viewModel.news.observe(viewLifecycleOwner, Observer{
-            news_swipe_refresh.isRefreshing = false
-            submitlist(it)
-            showFirstItemIfTablet(it.snapshot())
-            viewModel.setErrorLayoutVisibility(isVisible = false)
-        })
-
-        viewModel.error.observe(viewLifecycleOwner, EventObserver{
-            news_swipe_refresh.isRefreshing = false
-            if(adapter.itemCount<=0) viewModel.setErrorLayoutVisibility(isVisible = true)
-            else context?.toast(getString(R.string.get_news_fail))
-            EspressoIdlingResource.decrement()
-        })
 
         viewModel.isErrorLayoutVisible.observe(viewLifecycleOwner, EventObserver{isVisible->
             if(isVisible){
@@ -96,27 +94,71 @@ open class NewsFragment: Fragment(), OnNewsClickedEventListener{
             }
         })
 
-        if(adapter.itemCount<=0) getNews()
+        getNews()
+    }
+
+    fun initAdapter(){
+        news_list.adapter = adapter.withLoadStateHeaderAndFooter(
+                header = NewsLoadStateAdapter { adapter.retry() },
+                footer = NewsLoadStateAdapter { adapter.retry() }
+        )
+        adapter.addLoadStateListener { loadState ->
+//            Timber.d("loadStateChange: "+loadState)
+            if (loadState.refresh !is LoadState.NotLoading) {
+
+                news_swipe_refresh.isRefreshing = loadState.refresh is LoadState.Loading
+
+                if(loadState.refresh is LoadState.Error){
+                    if(adapter.itemCount<=0) viewModel.setErrorLayoutVisibility(true)
+                    else context?.toast(getString(R.string.get_news_fail))
+                }
+
+            } else {
+
+                news_swipe_refresh.isRefreshing = false
+                viewModel.setErrorLayoutVisibility(false)
+
+                val errorState = when {
+                    loadState.append is LoadState.Error -> {
+                        loadState.append as LoadState.Error
+                    }
+                    loadState.prepend is LoadState.Error -> {
+                        loadState.prepend as LoadState.Error
+                    }
+                    else -> {
+                        null
+                    }
+                }
+                errorState?.let {
+                    Timber.d(it.error)
+                    context?.toast(getString(R.string.get_news_fail))
+                }
+            }
+        }
     }
 
     fun getNews(){
         EspressoIdlingResource.increment()
-        viewModel.getNews()
-    }
+        newsJob?.cancel()
+        newsJob = lifecycleScope.launch {
+            viewModel.getNews().collectLatest {
+                Timber.d("collectLatestPagingData")
+                adapter.submitData(it)
+                showFirstItemIfTablet(adapter.getFirstItem())
+                viewModel.setErrorLayoutVisibility(isVisible = false)
 
-    fun refreshNews(){
-        viewModel.refreshNews()
-    }
-
-    private fun submitlist(newsList: PagedList<News>){
-        adapter.submitList(newsList){
-            EspressoIdlingResource.decrement()
+            }
         }
     }
 
-    private fun showFirstItemIfTablet(newsList: List<News>){
-        if(isTablet && newsList.isNotEmpty() && !childFragmentManager.hasFragments()){
-            onNewsClicked(newsList.first())
+    private fun refreshNews(){
+        Timber.d("refreshNews()")
+        adapter.refresh()
+    }
+
+    private fun showFirstItemIfTablet(news: News?){
+        if(isTablet && news != null && !childFragmentManager.hasFragments()){
+            onNewsClicked(news)
         }
     }
 

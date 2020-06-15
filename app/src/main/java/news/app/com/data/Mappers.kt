@@ -14,7 +14,7 @@ interface Mapper<in E, out D> {
 class NewsDbMapper @Inject constructor(private val sourceMapper: SourceDbMapper): Mapper<NewsEntity, News>{
 
     override fun map(e: NewsEntity): News {
-        Timber.d(e.toString())
+//        Timber.d(e.toString())
         return News(
                 title = e.title,
                 description = e.description,
@@ -42,7 +42,7 @@ class SourceDbMapper @Inject constructor(): Mapper<SourceEntity, Source?>{
 class NewsMapper @Inject constructor(private val sourceMapper: SourceMapper): Mapper<News, NewsModel>{
 
     override fun map(e: News): NewsModel {
-        Timber.d(e.toString())
+//        Timber.d(e.toString())
         return NewsModel(
                 title = e.title,
                 summary = e.description,
