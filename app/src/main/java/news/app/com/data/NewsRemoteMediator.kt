@@ -12,11 +12,15 @@ import news.app.com.data.persistence.NewsDatabase
 import news.app.com.data.persistence.RemoteKeys
 import news.app.com.data.retrofit.NewsService
 import news.app.com.data.retrofit.NoConnectivityException
+import news.app.com.ui.injection.modules.DataModule
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
 import java.io.InvalidObjectException
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Inject
+import javax.inject.Named
 
 private const val INITIAL_PAGE = 1
 
@@ -24,7 +28,9 @@ private const val INITIAL_PAGE = 1
 class NewsRemoteMediator @Inject constructor(
         private val newsService: NewsService,
         private val newsDatabase: NewsDatabase,
-        private val newsDbMapper: NewsDbMapper
+        private val newsDbMapper: NewsDbMapper,
+        private val sessionManager: SessionManager,
+        @Named(DataModule.DATE_FORMATTER) private val dateFormatter: SimpleDateFormat
 ): RemoteMediator<Int, News>() {
     override suspend fun load(loadType: LoadType, state: PagingState<Int, News>): MediatorResult {
         Timber.d("load(loadType: $loadType, state: $state")
@@ -35,9 +41,10 @@ class NewsRemoteMediator @Inject constructor(
             }
             LoadType.APPEND -> {
                 val remoteKeys = getRemoteKeyForLastItem(state)
-                if(remoteKeys?.nextKey == null){
-                    throw InvalidObjectException("Remote key should not be null for $loadType")
-                }
+                        ?: throw InvalidObjectException("Remote key should not be null for $loadType")
+
+                remoteKeys.nextKey?: return MediatorResult.Success(endOfPaginationReached = true)
+
                 remoteKeys.nextKey
             }
             LoadType.PREPEND -> {
@@ -51,8 +58,16 @@ class NewsRemoteMediator @Inject constructor(
         Timber.d("page: $page")
 
         return try{
+
+            showDbData(page)?.let{
+                return it
+            } ?: Timber.d("Getting News From API")
+
             val response = newsService.getNews(page = page)
             if(response.status == NewsService.RESPONSE_STATUS_OK){
+
+                sessionManager.totalNewsInResponse = response.totalResults
+
                 val newsResponse = response.articles.map {
                     newsDbMapper.map(it)
                 }
@@ -70,6 +85,7 @@ class NewsRemoteMediator @Inject constructor(
                         RemoteKeys(it.title, prevKey, nextKey)
                     }
 
+                    sessionManager.newsCacheDate = dateFormatter.format(Date())
                     newsDatabase.remoteKeysDao().insertAll(keys)
                     newsDatabase.newsDao().insertAllNews(newsResponse)
                 }
@@ -89,6 +105,27 @@ class NewsRemoteMediator @Inject constructor(
             exception.printStackTrace()
             MediatorResult.Error(exception)
         }
+    }
+
+    private suspend fun showDbData(page: Int): MediatorResult?{
+        val cacheDate = sessionManager.newsCacheDate
+        val newsCount = withContext(Dispatchers.IO) {newsDatabase.newsDao().getNewsCount()}
+        val currentDate = dateFormatter.format(Date())
+        val totalNewsInResponse = sessionManager.totalNewsInResponse
+        return if(newsCount>0 && cacheDate != null
+                && currentDate == cacheDate){
+            val newsInreferenceToPage = newsCount/(NewsService.RESPONSE_PAGE_SIZE*page)
+            return when{
+                (newsInreferenceToPage>0)->{
+                    MediatorResult.Success(false)
+                }
+                (newsInreferenceToPage==0 && newsCount==totalNewsInResponse)->{
+                    MediatorResult.Success(true)
+                }
+                else -> null
+            }
+
+        } else null
     }
 
     private suspend fun dbHasNews(): Boolean {

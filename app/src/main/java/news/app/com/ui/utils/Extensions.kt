@@ -37,6 +37,12 @@ fun Locale.getUTCDateTimeFormatter(): SimpleDateFormat{
     return simpleDateFormat
 }
 
+fun Locale.getUTCDateFormatter(): SimpleDateFormat{
+    val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd", this)
+    simpleDateFormat.timeZone = TimeZone.getTimeZone("UTC")
+    return simpleDateFormat
+}
+
 fun toVisibility(constraint: Boolean): Int = if (constraint) {
     View.VISIBLE
 } else {
