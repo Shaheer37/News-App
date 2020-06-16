@@ -4,6 +4,8 @@
     <style name="AppTheme" parent="Theme.AppCompat.DayNight">
         <item name="news_detail_title_text_color">@color/news_detail_title_text_color</item>
         <item name="news_row_bottom_border_color">@color/news_row_bottom_border_color</item>
+
+        <item name="android:indeterminateTint">@color/news_update_progress_tint</item>
     </style>
 
     <style name="AppTheme.NoActionBar">

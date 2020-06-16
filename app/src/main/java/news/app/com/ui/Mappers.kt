@@ -7,6 +7,7 @@ import news.app.com.domain.models.SourceModel
 import news.app.com.ui.injection.components.AppComponent
 import news.app.com.ui.models.News
 import news.app.com.ui.models.Source
+import timber.log.Timber
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -37,6 +38,7 @@ class NewsMapper @Inject constructor(
                 null
             }
         }
+//        Timber.d("Date: ${d.publishedDate} | $publishedDate")
         return News(
             title = d.title,
             summary = d.summary,

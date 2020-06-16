@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="news_update_progress_tint">#FFFFFF</color>
+
     <color name="news_detail_title_text_color">#FFFFFF</color>
 </resources>

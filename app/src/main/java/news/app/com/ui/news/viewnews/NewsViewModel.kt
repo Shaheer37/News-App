@@ -1,10 +1,7 @@
 package news.app.com.ui.news.viewnews
 
 import androidx.lifecycle.*
-import androidx.paging.DataSource
-import androidx.paging.LivePagedListBuilder
-import androidx.paging.PagedList
-import androidx.paging.PagingData
+import androidx.paging.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -27,9 +24,18 @@ class NewsViewModel @Inject constructor(
     private var _isErrorLayoutVisible = MutableLiveData<Event<Boolean>>()
     val isErrorLayoutVisible: LiveData<Event<Boolean>> = _isErrorLayoutVisible
 
+    private var currentNews: Flow<PagingData<News>>? = null
+
     fun getNews(): Flow<PagingData<News>> {
         Timber.d("getNews()")
-        return getNewsUsecase().map { it.map { newsModel -> newsMapper.mapToView(newsModel) } }
+
+        currentNews?.let { return it }
+
+        val news = getNewsUsecase()
+                .map { it.map { newsModel -> newsMapper.mapToView(newsModel) } }
+                .cachedIn(viewModelScope)
+        currentNews = news
+        return news
     }
 
     fun setErrorLayoutVisibility(isVisible: Boolean){

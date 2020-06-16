@@ -79,7 +79,7 @@ class NewsRemoteMediator @Inject constructor(
             }
         }catch (exception: NoConnectivityException) {
             exception.printStackTrace()
-            /*return if(loadType == LoadType.REFRESH && dbHasNews()){
+            return /*if(loadType == LoadType.REFRESH && dbHasNews()){
                 MediatorResult.Success(false)
             }else */MediatorResult.Error(exception)
         }catch (exception: IOException) {

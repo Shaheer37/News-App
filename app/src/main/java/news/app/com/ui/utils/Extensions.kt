@@ -32,7 +32,9 @@ fun Context.getCurrentLocale(): Locale {
 }
 
 fun Locale.getUTCDateTimeFormatter(): SimpleDateFormat{
-    return SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", this)
+    val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", this)
+    simpleDateFormat.timeZone = TimeZone.getTimeZone("UTC")
+    return simpleDateFormat
 }
 
 fun toVisibility(constraint: Boolean): Int = if (constraint) {
