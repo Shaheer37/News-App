@@ -13,6 +13,7 @@ import news.app.com.data.persistence.RemoteKeys
 import news.app.com.data.retrofit.NewsService
 import news.app.com.data.retrofit.NoConnectivityException
 import news.app.com.ui.injection.modules.DataModule
+import news.app.com.ui.utils.EspressoIdlingResource
 import retrofit2.HttpException
 import timber.log.Timber
 import java.io.IOException
@@ -34,34 +35,33 @@ class NewsRemoteMediator @Inject constructor(
 ): RemoteMediator<Int, News>() {
     override suspend fun load(loadType: LoadType, state: PagingState<Int, News>): MediatorResult {
         Timber.d("load(loadType: $loadType, state: $state")
-        val page = when(loadType){
-            LoadType.REFRESH -> {
-                val remoteKeys = getRemoteKeyClosestToCurrentPosition(state)
-                remoteKeys?.nextKey?.minus(1) ?: INITIAL_PAGE
-            }
-            LoadType.APPEND -> {
-                val remoteKeys = getRemoteKeyForLastItem(state)
-                        ?: throw InvalidObjectException("Remote key should not be null for $loadType")
 
-                remoteKeys.nextKey?: return MediatorResult.Success(endOfPaginationReached = true)
+        EspressoIdlingResource.increment()
 
-                remoteKeys.nextKey
-            }
-            LoadType.PREPEND -> {
-                val remoteKeys = getRemoteKeyForFirstItem(state)
-                remoteKeys?: throw InvalidObjectException("Remote key and the prevKey should not be null")
-
-                remoteKeys.prevKey?: return MediatorResult.Success(endOfPaginationReached = true)
-                remoteKeys.prevKey
-            }
+        return try{
+            getMediatorResult(loadType, state).also { EspressoIdlingResource.decrement() }
+        }catch (e: Exception){
+            e.printStackTrace()
+            EspressoIdlingResource.decrement()
+            throw e
         }
-        Timber.d("page: $page")
+
+    }
+
+    private suspend fun getMediatorResult(loadType: LoadType, state: PagingState<Int, News>):MediatorResult{
+        val page = try{
+            val result = getPageOrReturn(loadType, state)
+            result.second?.let { return it }
+            result.first
+        }catch (e: InvalidObjectException){
+            throw e
+        }
 
         return try{
 
             showDbData(page)?.let{
                 return it
-            } ?: Timber.d("Getting News From API")
+            }
 
             val response = newsService.getNews(page = page)
             if(response.status == NewsService.RESPONSE_STATUS_OK){
@@ -94,17 +94,38 @@ class NewsRemoteMediator @Inject constructor(
                 MediatorResult.Error(IOException("Error! Unsuccessful response from server."))
             }
         }catch (exception: NoConnectivityException) {
-            exception.printStackTrace()
-            return /*if(loadType == LoadType.REFRESH && dbHasNews()){
-                MediatorResult.Success(false)
-            }else */MediatorResult.Error(exception)
+            return MediatorResult.Error(exception)
         }catch (exception: IOException) {
-            exception.printStackTrace()
             MediatorResult.Error(exception)
         } catch (exception: HttpException) {
-            exception.printStackTrace()
             MediatorResult.Error(exception)
         }
+    }
+
+    private suspend fun getPageOrReturn(loadType: LoadType, state: PagingState<Int, News>): Pair<Int, MediatorResult?>{
+        val page = when(loadType){
+            LoadType.REFRESH -> {
+                val remoteKeys = getRemoteKeyClosestToCurrentPosition(state)
+                remoteKeys?.nextKey?.minus(1) ?: INITIAL_PAGE
+            }
+            LoadType.APPEND -> {
+                val remoteKeys = getRemoteKeyForLastItem(state)
+                        ?: throw InvalidObjectException("Remote key should not be null for $loadType")
+
+                remoteKeys.nextKey?: return Pair(0, MediatorResult.Success(endOfPaginationReached = true))
+
+                remoteKeys.nextKey
+            }
+            LoadType.PREPEND -> {
+                val remoteKeys = getRemoteKeyForFirstItem(state)
+                remoteKeys?: throw InvalidObjectException("Remote key and the prevKey should not be null")
+
+                remoteKeys.prevKey?: return Pair(0, MediatorResult.Success(endOfPaginationReached = true))
+                remoteKeys.prevKey
+            }
+        }
+
+        return Pair(page, null)
     }
 
     private suspend fun showDbData(page: Int): MediatorResult?{

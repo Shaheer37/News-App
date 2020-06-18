@@ -29,12 +29,9 @@ class NewsViewModel @Inject constructor(
     fun getNews(): Flow<PagingData<News>> {
         Timber.d("getNews()")
 
-        currentNews?.let { return it }
-
         val news = getNewsUsecase()
                 .map { it.map { newsModel -> newsMapper.mapToView(newsModel) } }
                 .cachedIn(viewModelScope)
-        currentNews = news
         return news
     }
 

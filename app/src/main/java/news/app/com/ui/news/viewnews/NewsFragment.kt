@@ -11,19 +11,12 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.paging.ExperimentalPagingApi
-import androidx.paging.LoadState
-import androidx.paging.PagedList
-import androidx.paging.PagingData
+import androidx.paging.*
 import androidx.recyclerview.widget.RecyclerView
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.fragment_news.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import news.app.com.R
 import news.app.com.ui.EventObserver
 import news.app.com.ui.news.newsdetails.NewsDetailFragment
@@ -46,6 +39,8 @@ open class NewsFragment: Fragment(), OnNewsClickedEventListener{
     private val isTablet: Boolean by lazy { resources.getBoolean(R.bool.is_tablet) }
 
     private var newsJob: Job? = null
+
+    private var isLoadingRefresh = false
 
     @VisibleForTesting
     open fun injectDependencies(){
@@ -97,20 +92,23 @@ open class NewsFragment: Fragment(), OnNewsClickedEventListener{
         getNews()
     }
 
-    fun initAdapter(){
+    private fun initAdapter(){
         news_list.adapter = adapter.withLoadStateHeaderAndFooter(
                 header = NewsLoadStateAdapter { adapter.retry() },
                 footer = NewsLoadStateAdapter { adapter.retry() }
         )
         adapter.addLoadStateListener { loadState ->
-//            Timber.d("loadStateChange: "+loadState)
+            Timber.d("loadStateChange: "+loadState)
+
             if (loadState.refresh !is LoadState.NotLoading) {
 
                 news_swipe_refresh.isRefreshing = loadState.refresh is LoadState.Loading
 
                 if(loadState.refresh is LoadState.Error){
+                    Timber.d("loadState.refresh: "+loadState.refresh)
                     if(adapter.itemCount<=0) viewModel.setErrorLayoutVisibility(true)
                     else context?.toast(getString(R.string.get_news_fail))
+                    EspressoIdlingResource.decrement()
                 }
 
             } else {
@@ -135,18 +133,23 @@ open class NewsFragment: Fragment(), OnNewsClickedEventListener{
                 }
             }
         }
+
+        adapter.addDataRefreshListener {
+            Timber.d("DataRefreshListener")
+            EspressoIdlingResource.decrement()
+            showFirstItemIfTablet(adapter.getFirstItem())
+            viewModel.setErrorLayoutVisibility(isVisible = false)
+        }
     }
 
     fun getNews(){
-        EspressoIdlingResource.increment()
         newsJob?.cancel()
         newsJob = lifecycleScope.launch {
-            viewModel.getNews().collectLatest {
-                Timber.d("collectLatestPagingData")
+            viewModel.getNews()
+            .collectLatest {
+                Timber.d("collectLatest")
+                EspressoIdlingResource.increment()
                 adapter.submitData(it)
-                showFirstItemIfTablet(adapter.getFirstItem())
-                viewModel.setErrorLayoutVisibility(isVisible = false)
-
             }
         }
     }
@@ -155,6 +158,7 @@ open class NewsFragment: Fragment(), OnNewsClickedEventListener{
         Timber.d("refreshNews()")
         adapter.refresh()
     }
+
 
     private fun showFirstItemIfTablet(news: News?){
         if(isTablet && news != null && !childFragmentManager.hasFragments()){

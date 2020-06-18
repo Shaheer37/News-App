@@ -15,6 +15,7 @@ android {
         versionCode 1
         versionName "1.0.0"
         testInstrumentationRunner "news.app.com.AndroidTestRunner"
+        testInstrumentationRunnerArguments clearPackageData: 'true'
     }
 
     def props = project.ext
@@ -41,8 +42,11 @@ android {
     }
 
     // Always show the result of every unit test when running via command line, even if it passes.
-    testOptions.unitTests {
-        includeAndroidResources = true
+    testOptions{
+        execution 'ANDROIDX_TEST_ORCHESTRATOR'
+        unitTests {
+            includeAndroidResources = true
+        }
     }
 
     dexOptions {
@@ -148,7 +152,6 @@ dependencies {
     kaptAndroidTest "com.google.dagger:dagger-compiler:$daggerVersion"
 
     androidTestImplementation "androidx.test:core:$androidXTestCoreVersion"
-    androidTestImplementation "androidx.test:runner:$androidXTestCoreVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidXTestExtKotlinRunnerVersion"
     androidTestImplementation "androidx.test.ext:junit-ktx:$androidXTestExtKotlinRunnerVersion"
 
@@ -166,4 +169,7 @@ dependencies {
     androidTestImplementation "androidx.test.espresso:espresso-contrib:$espressoCoreVersion"
     androidTestImplementation "androidx.test.espresso:espresso-intents:$espressoCoreVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidXTestExtKotlinRunnerVersion"
+
+    androidTestImplementation "androidx.test:runner:$androidXTestCoreVersion"
+    androidTestUtil "androidx.test:orchestrator:$androidXTestCoreVersion"
 }

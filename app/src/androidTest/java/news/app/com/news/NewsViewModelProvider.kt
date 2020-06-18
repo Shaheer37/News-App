@@ -9,8 +9,7 @@ import javax.inject.Provider
 
 class NewsViewModelProvider @Inject constructor(
     private val newsMapper: NewsMapper,
-    private val getNewsUsecase: GetNewsUsecase,
-    private val newsBoundaryCallback: NewsBoundaryCallback
+    private val getNewsUsecase: GetNewsUsecase
 ): Provider<ViewModel>{
-    override fun get(): ViewModel = NewsViewModel(newsMapper, getNewsUsecase, newsBoundaryCallback)
+    override fun get(): ViewModel = NewsViewModel(newsMapper, getNewsUsecase)
 }
