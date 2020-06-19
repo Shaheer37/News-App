@@ -14,7 +14,7 @@ interface NewsDao{
     suspend fun insertAllNews(news:List<News>)
 
     @Query("select COUNT(*) from News")
-    fun getNewsCount(): Int
+    suspend fun getNewsCount(): Int
 
     @Transaction
     @Query("select * from News")

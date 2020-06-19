@@ -7,6 +7,7 @@ import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runBlockingTest
 import news.app.com.data.persistence.News
 import news.app.com.data.persistence.NewsDatabase
 import news.app.com.data.persistence.Source
@@ -33,7 +34,7 @@ class NewsDaoTest {
     }
 
     @Test
-    fun testInsertNewsAndGetNewsDetails(){
+    fun testInsertNewsAndGetNewsDetails() = runBlockingTest{
         val news = News(
                 "SpaceX Launch: Highlights From the Weather-Delayed Mission",
                 "Follow SpaceX's launch of NASA astronauts aboard the Crew Dragon spacecraft.",

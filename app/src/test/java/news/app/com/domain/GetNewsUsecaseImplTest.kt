@@ -24,7 +24,6 @@ class GetNewsUsecaseImplTest{
     @ExperimentalCoroutinesApi
     fun testNewsUsecase_successfulcase() = runBlockingTest{
         newsUsecaseImpl()
-
         verify(newsRepository).getNews()
     }
 }

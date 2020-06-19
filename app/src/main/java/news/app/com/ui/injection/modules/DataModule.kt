@@ -23,7 +23,7 @@ import javax.inject.Singleton
 @ExperimentalPagingApi
 interface DataModule {
     @Module
-    companion object{
+    companion object {
 
         public const val DATE_FORMATTER = "dateFormatter"
 
@@ -31,7 +31,7 @@ interface DataModule {
         @JvmStatic
         @Singleton
         fun providesNewsService(@Named(AppComponent.CONTEXT) context: Context): NewsService {
-            return DataFactory.makeService(context = context,showLogs = BuildConfig.DEBUG)
+            return DataFactory.makeService(context = context, showLogs = BuildConfig.DEBUG)
         }
 
 
@@ -52,7 +52,7 @@ interface DataModule {
         @Provides
         @JvmStatic
         @Singleton
-        fun providesSessionManager(@Named(AppComponent.CONTEXT) context: Context): SessionManager{
+        fun providesSessionManager(@Named(AppComponent.CONTEXT) context: Context): SessionManager {
             return SessionManager(context)
         }
 

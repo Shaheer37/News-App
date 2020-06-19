@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import news.app.com.data.persistence.News
 import news.app.com.data.persistence.NewsDatabase
+import news.app.com.data.persistence.NewsLocalData
 import news.app.com.data.persistence.RemoteKeys
 import news.app.com.data.retrofit.NewsService
 import news.app.com.data.retrofit.NoConnectivityException
@@ -28,7 +29,7 @@ private const val INITIAL_PAGE = 1
 @OptIn(ExperimentalPagingApi::class)
 class NewsRemoteMediator @Inject constructor(
         private val newsService: NewsService,
-        private val newsDatabase: NewsDatabase,
+        private val newsLocalData: NewsLocalData,
         private val newsDbMapper: NewsDbMapper,
         private val sessionManager: SessionManager,
         @Named(DataModule.DATE_FORMATTER) private val dateFormatter: SimpleDateFormat
@@ -63,36 +64,7 @@ class NewsRemoteMediator @Inject constructor(
                 return it
             }
 
-            val response = newsService.getNews(page = page)
-            if(response.status == NewsService.RESPONSE_STATUS_OK){
-
-                sessionManager.totalNewsInResponse = response.totalResults
-
-                val newsResponse = response.articles.map {
-                    newsDbMapper.map(it)
-                }
-                val endOfPaginationReached = newsResponse.isEmpty()
-                newsDatabase.withTransaction {
-                    if (loadType == LoadType.REFRESH) {
-                        newsDatabase.remoteKeysDao().clearRemoteKeys()
-                        newsDatabase.newsDao().deleteAllNews()
-                    }
-
-                    val prevKey = if(page == INITIAL_PAGE) null else page-1
-                    val nextKey = if(endOfPaginationReached) null else page+1
-
-                    val keys = newsResponse.map{
-                        RemoteKeys(it.title, prevKey, nextKey)
-                    }
-
-                    sessionManager.newsCacheDate = dateFormatter.format(Date())
-                    newsDatabase.remoteKeysDao().insertAll(keys)
-                    newsDatabase.newsDao().insertAllNews(newsResponse)
-                }
-                MediatorResult.Success(endOfPaginationReached)
-            }else{
-                MediatorResult.Error(IOException("Error! Unsuccessful response from server."))
-            }
+            getNews(page, loadType)
         }catch (exception: NoConnectivityException) {
             return MediatorResult.Error(exception)
         }catch (exception: IOException) {
@@ -128,9 +100,34 @@ class NewsRemoteMediator @Inject constructor(
         return Pair(page, null)
     }
 
+    private suspend fun getRemoteKeyForLastItem(state: PagingState<Int, News>): RemoteKeys? {
+        return state.pages.lastOrNull { it.data.isNotEmpty() }?.data?.lastOrNull()
+                ?.let { news ->
+                    newsLocalData.getNewsKeyForNewsTitle(news.title)
+                }
+    }
+
+    private suspend fun getRemoteKeyForFirstItem(state: PagingState<Int, News>): RemoteKeys? {
+        return state.pages.firstOrNull { it.data.isNotEmpty() }
+                ?.data?.firstOrNull()
+                ?.let { news ->
+                    newsLocalData.getNewsKeyForNewsTitle(news.title)
+                }
+    }
+
+    private suspend fun getRemoteKeyClosestToCurrentPosition(
+            state: PagingState<Int, News>
+    ): RemoteKeys? {
+        return state.anchorPosition?.let { position ->
+            state.closestItemToPosition(position)?.title?.let { title ->
+                newsLocalData.getNewsKeyForNewsTitle(title)
+            }
+        }
+    }
+
     private suspend fun showDbData(page: Int): MediatorResult?{
         val cacheDate = sessionManager.newsCacheDate
-        val newsCount = withContext(Dispatchers.IO) {newsDatabase.newsDao().getNewsCount()}
+        val newsCount = withContext(Dispatchers.IO) {newsLocalData.getNewsCount()}
         val currentDate = dateFormatter.format(Date())
         val totalNewsInResponse = sessionManager.totalNewsInResponse
         return if(newsCount>0 && cacheDate != null
@@ -149,35 +146,38 @@ class NewsRemoteMediator @Inject constructor(
         } else null
     }
 
-    private suspend fun dbHasNews(): Boolean {
-        return withContext(Dispatchers.IO){
-            val newsCount = newsDatabase.newsDao().getNewsCount()
-            newsCount>0
-        }
-    }
+    private suspend fun getNews(page: Int, loadType: LoadType): MediatorResult{
+        val response = newsService.getNews(page = page)
+        return if(response.status == NewsService.RESPONSE_STATUS_OK){
 
-    private suspend fun getRemoteKeyForLastItem(state: PagingState<Int, News>): RemoteKeys? {
-        return state.pages.lastOrNull { it.data.isNotEmpty() }?.data?.lastOrNull()
-                ?.let { news ->
-                    newsDatabase.remoteKeysDao().remoteKeysNewsId(news.title)
-                }
-    }
+            sessionManager.totalNewsInResponse = response.totalResults
 
-    private suspend fun getRemoteKeyForFirstItem(state: PagingState<Int, News>): RemoteKeys? {
-        return state.pages.firstOrNull { it.data.isNotEmpty() }
-                ?.data?.firstOrNull()
-                ?.let { news ->
-                    newsDatabase.remoteKeysDao().remoteKeysNewsId(news.title)
-                }
-    }
-
-    private suspend fun getRemoteKeyClosestToCurrentPosition(
-            state: PagingState<Int, News>
-    ): RemoteKeys? {
-        return state.anchorPosition?.let { position ->
-            state.closestItemToPosition(position)?.title?.let { repoId ->
-                newsDatabase.remoteKeysDao().remoteKeysNewsId(repoId)
+            val newsResponse = response.articles.map {
+                newsDbMapper.map(it)
             }
+
+            if (loadType == LoadType.REFRESH) {
+                newsLocalData.clearDatabase()
+            }
+
+            updateNews(page, newsResponse)
+
+            MediatorResult.Success(newsResponse.isEmpty())
+        }else{
+            MediatorResult.Error(IOException("Error! Unsuccessful response from server."))
         }
+    }
+
+    private suspend fun updateNews(page: Int, news: List<News>){
+        val prevKey = if(page == INITIAL_PAGE) null else page-1
+        val nextKey = if(news.isEmpty()) null else page+1
+
+        val keys = news.map{
+            RemoteKeys(it.title, prevKey, nextKey)
+        }
+
+        sessionManager.newsCacheDate = dateFormatter.format(Date())
+        newsLocalData.insertNewsKeys(keys)
+        newsLocalData.insertNews(news)
     }
 }

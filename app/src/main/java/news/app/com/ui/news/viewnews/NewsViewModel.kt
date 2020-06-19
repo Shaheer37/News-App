@@ -24,8 +24,6 @@ class NewsViewModel @Inject constructor(
     private var _isErrorLayoutVisible = MutableLiveData<Event<Boolean>>()
     val isErrorLayoutVisible: LiveData<Event<Boolean>> = _isErrorLayoutVisible
 
-    private var currentNews: Flow<PagingData<News>>? = null
-
     fun getNews(): Flow<PagingData<News>> {
         Timber.d("getNews()")
 
