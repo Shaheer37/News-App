@@ -37,10 +37,10 @@ class NewsDbMapperTest{
         assertEquals(newsData.title, newsModel.title)
         assertEquals(newsData.description, newsModel.description)
         assertEquals(newsData.url, newsModel.url)
-        assertNull("Author is not null", newsModel.author)
+        assertEquals("",newsModel.author)
         assertEquals(newsData.publishedDate, newsModel.publishedDate)
         assertEquals(newsData.imageUrl, newsModel.imageUrl)
-        assertNull("Source is not null", newsModel.source)
+        assertNull(newsModel.source)
     }
 
     @Test

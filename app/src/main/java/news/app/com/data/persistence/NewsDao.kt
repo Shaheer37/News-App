@@ -22,7 +22,7 @@ interface NewsDao{
 
     @Transaction
     @Query("select * from News")
-    fun getNewsList(): List<News>
+    suspend fun getNewsList(): List<News>
 
     @Query("delete from News")
     suspend fun deleteAllNews(): Int

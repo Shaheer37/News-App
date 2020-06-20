@@ -7,6 +7,8 @@ import javax.inject.Inject
 class NewsLocalData @Inject constructor(private val newsDatabase: NewsDatabase) {
     fun getNews(): PagingSource<Int, News> = newsDatabase.newsDao().getNewsSource()
 
+    suspend fun getNewsList(): List<News> = newsDatabase.newsDao().getNewsList()
+
     suspend fun getNewsCount(): Int = newsDatabase.newsDao().getNewsCount()
 
     suspend fun insertNews(news: List<News>) = newsDatabase.newsDao().insertAllNews(news)
