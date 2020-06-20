@@ -40,7 +40,8 @@ class NewsRemoteMediator @Inject constructor(
         EspressoIdlingResource.increment()
 
         return try{
-            getMediatorResult(loadType, state).also { EspressoIdlingResource.decrement() }
+            getMediatorResult(loadType, state)
+                    .also { EspressoIdlingResource.decrement() }
         }catch (e: Exception){
             e.printStackTrace()
             EspressoIdlingResource.decrement()
@@ -66,10 +67,13 @@ class NewsRemoteMediator @Inject constructor(
 
             getNews(page, loadType)
         }catch (exception: NoConnectivityException) {
+            exception.printStackTrace()
             return MediatorResult.Error(exception)
         }catch (exception: IOException) {
+            exception.printStackTrace()
             MediatorResult.Error(exception)
         } catch (exception: HttpException) {
+            exception.printStackTrace()
             MediatorResult.Error(exception)
         }
     }
