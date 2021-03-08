@@ -6,3 +6,4 @@
 /captures
 **/*.iml
 **/build
+/app/release
