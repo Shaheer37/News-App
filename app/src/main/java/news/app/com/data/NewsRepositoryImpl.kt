@@ -1,9 +1,6 @@
 package news.app.com.data
 
-import androidx.paging.DataSource
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
+import androidx.paging.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -24,6 +21,7 @@ class NewsRepositoryImpl @Inject constructor(
     private val newsRemoteMediator: NewsRemoteMediator
 ): NewsRepository {
 
+    @ExperimentalPagingApi
     override fun getNews(): Flow<PagingData<NewsModel>> = Pager(
             config = PagingConfig(pageSize = NewsService.RESPONSE_PAGE_SIZE),
             remoteMediator = newsRemoteMediator,
