@@ -14,7 +14,7 @@ interface NewsService{
     }
 //    @GET("nl6jh")
     @GET("top-headlines")
-    @Headers("X-Api-Key: ${BuildConfig.NewsApiKey}")
+    @Headers("X-Api-Key: ${BuildConfig.NEWS_API_KEY}")
     suspend fun getNews(
         @Query("country") countryCode: String="US",
         @Query("pageSize") pageSize: Int = RESPONSE_PAGE_SIZE,
